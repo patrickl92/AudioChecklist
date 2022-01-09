@@ -28,8 +28,8 @@ end
 
 --- Creates a new voice.
 -- @tparam string name The name of the voice
--- @tparam string challengeFilesDirectory The path to the directory which contains the challenge sound files. If this parameter is an empty string, then no challenge sound files can be added.
--- @tparam string responseFilesDirectory The path to the directory which contains the response and fail sound files. If this parameter is an empty string, then no response or fail sound files can be added.
+-- @tparam string challengeFilesDirectoryPath The path to the directory which contains the challenge sound files. If this parameter is an empty string, then no challenge sound files can be added.
+-- @tparam string responseFilesDirectoryPath The path to the directory which contains the response and fail sound files. If this parameter is an empty string, then no response or fail sound files can be added.
 -- @treturn waveFileVoice The created voice
 function waveFileVoice:new(name, challengeFilesDirectoryPath, responseFilesDirectoryPath)
     utils.verifyType("challengeFilesDirectoryPath", challengeFilesDirectoryPath, "string")
