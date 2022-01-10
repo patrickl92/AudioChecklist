@@ -49,8 +49,8 @@ end
 
 --- Creates a new voice.
 -- @tparam string name The name of the voice
--- @tparam string challengeFilesDirectoryPath The path to the directory which contains the challenge sound files. Must not be empty. If this parameter is nil, then no challenge sound files can be added.
--- @tparam string responseFilesDirectoryPath The path to the directory which contains the response and fail sound files. Must not be empty. If this parameter is nil, then no response or fail sound files can be added.
+-- @tparam string challengeFilesDirectoryPath The path to the directory which contains the challenge sound files. Must not be empty. If this parameter is <code>nil</code>, then no challenge sound files can be added.
+-- @tparam string responseFilesDirectoryPath The path to the directory which contains the response and fail sound files. Must not be empty. If this parameter is <code>nil</code>, then no response or fail sound files can be added.
 -- @treturn waveFileVoice The created voice
 function waveFileVoice:new(name, challengeFilesDirectoryPath, responseFilesDirectoryPath)
     if challengeFilesDirectoryPath ~= nil then
