@@ -82,7 +82,7 @@ end
 function voice:stop()
 end
 
---- Checks whether the active sound has finished playing
+--- Checks whether the active sound has finished playing.
 -- This function should be implemented in a derived voice class.
 -- @treturn bool Always <code>true</code>.
 function voice:isFinished()
