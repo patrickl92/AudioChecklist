@@ -10,9 +10,30 @@ local voice = require "audiochecklist.voice"
 local audio = require "audiochecklist.audio"
 local utils = require "audiochecklist.utils"
 
+--- Verifies if a voice was activated.
+-- @tparam voice voice The voice.
+-- @raise An error is thrown if neither the challenges nor the responses of the voice were activated.
 local function verifyActivated(voice)
-    if not voice.initialized then
+    if not voice.challengesInitialized and not voice.responsesInitialized then
         error("voice '" .. voice:getName() .. "' was not activated")
+    end
+end
+
+--- Verifies if a voice was activated for the challenges.
+-- @tparam voice voice The voice.
+-- @raise An error is thrown if the voice was not activated for the challenges.
+local function verifyChallengesActivated(voice)
+    if not voice.challengesInitialized then
+        error("voice '" .. voice:getName() .. "' was not activated for the challenges")
+    end
+end
+
+--- Verifies if a voice was activated for the responses.
+-- @tparam voice voice The voice.
+-- @raise An error is thrown if the voice was not activated for the responses.
+local function verifyResponsesActivated(voice)
+    if not voice.responsesInitialized then
+        error("voice '" .. voice:getName() .. "' was not activated for the responses")
     end
 end
 
@@ -28,12 +49,25 @@ end
 
 --- Creates a new voice.
 -- @tparam string name The name of the voice
--- @tparam string challengeFilesDirectoryPath The path to the directory which contains the challenge sound files. If this parameter is an empty string, then no challenge sound files can be added.
--- @tparam string responseFilesDirectoryPath The path to the directory which contains the response and fail sound files. If this parameter is an empty string, then no response or fail sound files can be added.
+-- @tparam string challengeFilesDirectoryPath The path to the directory which contains the challenge sound files. Must not be empty. If this parameter is nil, then no challenge sound files can be added.
+-- @tparam string responseFilesDirectoryPath The path to the directory which contains the response and fail sound files. Must not be empty. If this parameter is nil, then no response or fail sound files can be added.
 -- @treturn waveFileVoice The created voice
 function waveFileVoice:new(name, challengeFilesDirectoryPath, responseFilesDirectoryPath)
-    utils.verifyType("challengeFilesDirectoryPath", challengeFilesDirectoryPath, "string")
-    utils.verifyType("responseFilesDirectoryPath", responseFilesDirectoryPath, "string")
+    if challengeFilesDirectoryPath ~= nil then
+        utils.verifyType("challengeFilesDirectoryPath", challengeFilesDirectoryPath, "string")
+
+        if string.len(challengeFilesDirectoryPath) == 0 then
+            error("challengeFilesDirectoryPath must not be empty")
+        end
+    end
+
+    if responseFilesDirectoryPath ~= nil then
+        utils.verifyType("responseFilesDirectoryPath", responseFilesDirectoryPath, "string")
+
+        if string.len(responseFilesDirectoryPath) == 0 then
+            error("responseFilesDirectoryPath must not be empty")
+        end
+    end
 
     waveFileVoice.__index = waveFileVoice
     setmetatable(waveFileVoice, {
@@ -45,7 +79,9 @@ function waveFileVoice:new(name, challengeFilesDirectoryPath, responseFilesDirec
 
     obj.challengeFilesDirectoryPath = challengeFilesDirectoryPath
     obj.responseFilesDirectoryPath = responseFilesDirectoryPath
-    obj.initialized = false
+
+    obj.challengesInitialized = false
+    obj.responsesInitialized = false
 
     obj.challengeSoundFiles = {}
     obj.responseSoundFiles = {}
@@ -58,10 +94,10 @@ function waveFileVoice:new(name, challengeFilesDirectoryPath, responseFilesDirec
     return obj
 end
 
---- Gets called when the voice is selected for providing the audio output.
--- Loads all audio files into the FlyWithLua sound table.
-function waveFileVoice:onActivated()
-    if self.initialized then
+--- Gets called when the voice is selected for providing the audio output for the challenges.
+-- Can be used to initialize the voice. This function does nothing in this implementation.
+function waveFileVoice:activateChallengeSounds()
+    if self.challengesInitialized then
         return
     end
 
@@ -73,6 +109,16 @@ function waveFileVoice:onActivated()
         else
             utils.logError("WaveFileVoice", "The file '" .. fullPath .. "' does not exist")
         end
+    end
+
+    self.challengesInitialized = true
+end
+
+--- Gets called when the voice is selected for providing the audio output for the responses and failures.
+-- Can be used to initialize the voice. This function does nothing in this implementation.
+function waveFileVoice:activateResponseSounds()
+    if self.responsesInitialized then
+        return
     end
 
     for key, soundFileName in pairs(self.responseSoundFiles) do
@@ -95,17 +141,15 @@ function waveFileVoice:onActivated()
         end
     end
 
-    self.initialized = true
+    self.responsesInitialized = true
 end
 
---- Gets called when the voice is no longer an active audio provider.
--- Releases all loaded audio files.
-function waveFileVoice:onDeactivated()
-    if not self.initialized then
+--- Gets called when the voice is no longer an active audio provider for the challenges.
+-- Can be used to release any resources. This function does nothing in this implementation.
+function waveFileVoice:deactivateChallengeSounds()
+    if not self.challengesInitialized then
         return
     end
-
-    self:stop()
 
     -- Release the loaded sounds and remove all references
     for key, _ in pairs(self.challengeSounds) do
@@ -113,6 +157,17 @@ function waveFileVoice:onDeactivated()
         self.challengeSounds[key] = nil
     end
 
+    self.challengesInitialized = false
+end
+
+--- Gets called when the voice is no longer an active audio provider for the responses and failures.
+-- Can be used to release any resources. This function does nothing in this implementation.
+function waveFileVoice:deactivateResponseSounds()
+    if not self.responsesInitialized then
+        return
+    end
+
+    -- Release the loaded sounds and remove all references
     for key, _ in pairs(self.responseSounds) do
         audio.releaseSound(self.responseSounds[key])
         self.responseSounds[key] = nil
@@ -123,7 +178,7 @@ function waveFileVoice:onDeactivated()
         self.failSounds[key] = nil
     end
 
-    self.initialized = false
+    self.responsesInitialized = false
 end
 
 --- Starts playing the challenge sound with the specified key.
@@ -133,7 +188,7 @@ end
 -- @raise An error is thrown if the voice was not activated.
 function waveFileVoice:playChallengeSound(key)
     utils.verifyType("key", key, "string")
-    verifyActivated(self)
+    verifyChallengesActivated(self)
 
     local sound = self.challengeSounds[key]
     if not sound then
@@ -151,7 +206,7 @@ end
 -- @raise An error is thrown if the voice was not activated.
 function waveFileVoice:playResponseSound(key)
     utils.verifyType("key", key, "string")
-    verifyActivated(self)
+    verifyResponsesActivated(self)
 
     local sound = self.responseSounds[key]
     if not sound then
@@ -167,7 +222,7 @@ end
 -- If the voice does not contain a fail sound, then no sound is played.
 -- @raise An error is thrown if the voice was not activated.
 function waveFileVoice:playFailSound()
-    verifyActivated(self)
+    verifyResponsesActivated(self)
 
     if #self.failSounds > 0 then
         playSound(self, self.failSounds[math.random(#self.failSounds)])
@@ -232,7 +287,7 @@ function waveFileVoice:addChallengeSoundFile(key, soundFileName)
     utils.verifyType("key", key, "string")
     utils.verifyType("soundFileName", soundFileName, "string")
 
-    if self.challengeFilesDirectoryPath == "" then
+    if not self.challengeFilesDirectoryPath then
         error("Challenge files directory was not set")
     end
 
@@ -248,7 +303,7 @@ function waveFileVoice:addResponseSoundFile(key, soundFileName)
     utils.verifyType("key", key, "string")
     utils.verifyType("soundFileName", soundFileName, "string")
 
-    if self.responseFilesDirectoryPath == "" then
+    if not self.responseFilesDirectoryPath then
         error("Response files directory was not set")
     end
 
@@ -262,7 +317,7 @@ end
 function waveFileVoice:addFailSoundFile(soundFileName)
     utils.verifyType("soundFileName", soundFileName, "string")
 
-    if self.responseFilesDirectoryPath == "" then
+    if not self.responseFilesDirectoryPath then
         error("Response files directory was not set")
     end
 

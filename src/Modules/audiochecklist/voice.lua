@@ -30,14 +30,24 @@ function voice:getName()
     return self.name
 end
 
---- Gets called when the voice is selected for providing the audio output.
+--- Gets called when the voice is selected for providing the audio output for the challenges.
 -- Can be used to initialize the voice. This function does nothing in this implementation.
-function voice:onActivated()
+function voice:activateChallengeSounds()
 end
 
---- Gets called when the voice is no longer an active audio provider.
+--- Gets called when the voice is selected for providing the audio output for the responses and failures.
+-- Can be used to initialize the voice. This function does nothing in this implementation.
+function voice:activateResponseSounds()
+end
+
+--- Gets called when the voice is no longer an active audio provider for the challenges.
 -- Can be used to release any resources. This function does nothing in this implementation.
-function voice:onDeactivated()
+function voice:deactivateChallengeSounds()
+end
+
+--- Gets called when the voice is no longer an active audio provider for the responses and failures.
+-- Can be used to release any resources. This function does nothing in this implementation.
+function voice:deactivateResponseSounds()
 end
 
 --- Starts playing the challenge sound with the specified key.

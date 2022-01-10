@@ -63,30 +63,92 @@ describe("WaveFileVoice", function()
     end)
 
     it("should throw an error if not initialized correctly", function()
-        assert.has_error(function() waveFileVoice:new(nil, "", "") end, "name must be a string")
-        assert.has_error(function() waveFileVoice:new(0, "", "") end, "name must be a string")
-        assert.has_error(function() waveFileVoice:new("", nil, "") end, "challengeFilesDirectoryPath must be a string")
-        assert.has_error(function() waveFileVoice:new("", 0, "") end, "challengeFilesDirectoryPath must be a string")
-        assert.has_error(function() waveFileVoice:new("", "", nil) end, "responseFilesDirectoryPath must be a string")
-        assert.has_error(function() waveFileVoice:new("", "", 0) end, "responseFilesDirectoryPath must be a string")
+        assert.has_error(function() waveFileVoice:new(nil, nil, nil) end, "name must be a string")
+        assert.has_error(function() waveFileVoice:new(0, nil, nil) end, "name must be a string")
+        assert.has_error(function() waveFileVoice:new("", 0, nil) end, "challengeFilesDirectoryPath must be a string")
+        assert.has_error(function() waveFileVoice:new("", "", nil) end, "challengeFilesDirectoryPath must not be empty")
+        assert.has_error(function() waveFileVoice:new("", nil, 0) end, "responseFilesDirectoryPath must be a string")
+        assert.has_error(function() waveFileVoice:new("", nil, "") end, "responseFilesDirectoryPath must not be empty")
     end)
 
     it("should throw an error if challenge sound files are added but the challenge directory is not set", function()
-        local voice = waveFileVoice:new("Patrick", "", "responses")
+        local voice = waveFileVoice:new("Patrick", nil, "responses")
         assert.has_error(function() voice:addChallengeSoundFile("1", "Challenge.wav") end, "Challenge files directory was not set")
     end)
 
     it("should throw an error if response sound files are added but the response directory is not set", function()
-        local voice = waveFileVoice:new("Patrick", "challenges", "")
+        local voice = waveFileVoice:new("Patrick", "challenges", nil)
         assert.has_error(function() voice:addResponseSoundFile("One", "Response.wav") end, "Response files directory was not set")
     end)
 
     it("should throw an error if fail sound files are added but the response directory is not set", function()
-        local voice = waveFileVoice:new("Patrick", "challenges", "")
+        local voice = waveFileVoice:new("Patrick", "challenges", nil)
         assert.has_error(function() voice:addFailSoundFile("Fail.wav") end, "Response files directory was not set")
     end)
 
-    it("should load the sounds when activated", function()
+    it("should load the challenge sounds when activated", function()
+        soundLookup["challenges/Challenge1.wav"] = createSound()
+        soundLookup["challenges/Challenge2.wav"] = createSound()
+        soundLookup["responses/Response.wav"] = createSound()
+        soundLookup["responses/Fail.wav"] = createSound()
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge1.wav")
+        voice:addChallengeSoundFile("2", "Challenge2.wav")
+
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:addFailSoundFile("Fail.wav")
+
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge1.wav")
+        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge2.wav")
+        assert.stub(audio.loadSoundFile).was.called(2)
+    end)
+
+    it("should only load existing challenge sounds when activated", function()
+        stub(utils, "fileExists", function(path) return not string.find(path, "NotExisting") end)
+
+        finally(function()
+            utils.fileExists:revert()
+        end)
+
+        soundLookup["challenges/Challenge.wav"] = createSound()
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge.wav")
+        voice:addChallengeSoundFile("2", "NotExisting.wav")
+
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge.wav")
+        assert.stub(audio.loadSoundFile).was.called(1)
+    end)
+
+    it("should load the challenge sounds only once when activated multiple times", function()
+        soundLookup["challenges/Challenge.wav"] = createSound()
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge.wav")
+
+        voice:activateChallengeSounds()
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(1)
+    end)
+
+    it("should not throw an error if there are no challenge sounds to load", function()
+        local voice = createVoice()
+
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was_not_called()
+    end)
+
+    it("should load the response and fail sounds when activated", function()
         soundLookup["challenges/Challenge1.wav"] = createSound()
         soundLookup["challenges/Challenge2.wav"] = createSound()
         soundLookup["responses/Response1.wav"] = createSound()
@@ -105,32 +167,26 @@ describe("WaveFileVoice", function()
         voice:addFailSoundFile("Fail1.wav")
         voice:addFailSoundFile("Fail2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
 
-        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge1.wav")
-        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge2.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Response1.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Response2.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Fail1.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Fail2.wav")
-        assert.stub(audio.loadSoundFile).was.called(6)
+        assert.stub(audio.loadSoundFile).was.called(4)
     end)
 
-    it("should only load existing sounds when activated", function()
+    it("should only load existing response and fail sounds when activated", function()
         stub(utils, "fileExists", function(path) return not string.find(path, "NotExisting") end)
 
         finally(function()
             utils.fileExists:revert()
         end)
 
-        soundLookup["challenges/Challenge.wav"] = createSound()
         soundLookup["responses/Response.wav"] = createSound()
         soundLookup["responses/Fail.wav"] = createSound()
 
         local voice = createVoice()
-
-        voice:addChallengeSoundFile("1", "Challenge.wav")
-        voice:addChallengeSoundFile("2", "NotExisting.wav")
 
         voice:addResponseSoundFile("One", "Response.wav")
         voice:addResponseSoundFile("Two", "NotExisting.wav")
@@ -138,40 +194,14 @@ describe("WaveFileVoice", function()
         voice:addFailSoundFile("Fail.wav")
         voice:addFailSoundFile("NotExisting.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
 
-        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Response.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Fail.wav")
-        assert.stub(audio.loadSoundFile).was.called(3)
+        assert.stub(audio.loadSoundFile).was.called(2)
     end)
 
-    it("should load the sounds only once when activated multiple times", function()
-        soundLookup["challenges/Challenge.wav"] = createSound()
-        soundLookup["responses/Response.wav"] = createSound()
-        soundLookup["responses/Fail.wav"] = createSound()
-
-        local voice = createVoice()
-
-        voice:addChallengeSoundFile("1", "Challenge.wav")
-        voice:addResponseSoundFile("One", "Response.wav")
-        voice:addFailSoundFile("Fail.wav")
-
-        voice:onActivated()
-        voice:onActivated()
-
-        assert.stub(audio.loadSoundFile).was.called(3)
-    end)
-
-    it("should not throw an error if there are no sounds to load", function()
-        local voice = createVoice()
-
-        voice:onActivated()
-
-        assert.stub(audio.loadSoundFile).was_not_called()
-    end)
-
-    it("should not throw an error if there are no challenge sounds to load", function()
+    it("should load the response and fail sounds only once when activated multiple times", function()
         soundLookup["responses/Response.wav"] = createSound()
         soundLookup["responses/Fail.wav"] = createSound()
 
@@ -180,49 +210,118 @@ describe("WaveFileVoice", function()
         voice:addResponseSoundFile("One", "Response.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+        voice:activateResponseSounds()
 
         assert.stub(audio.loadSoundFile).was.called(2)
     end)
 
     it("should not throw an error if there are no response sounds to load", function()
-        soundLookup["challenges/Challenge.wav"] = createSound()
         soundLookup["responses/Fail.wav"] = createSound()
 
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
 
-        assert.stub(audio.loadSoundFile).was.called(2)
+        assert.stub(audio.loadSoundFile).was.called(1)
     end)
 
     it("should not throw an error if there are no fail sounds to load", function()
-        soundLookup["challenges/Challenge.wav"] = createSound()
         soundLookup["responses/Response.wav"] = createSound()
 
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
 
-        assert.stub(audio.loadSoundFile).was.called(2)
+        assert.stub(audio.loadSoundFile).was.called(1)
     end)
 
-    it("should release all loaded sounds when deactivated", function()
+    it("should not throw an error if there are no response sounds and no fail sounds to load", function()
+        local voice = createVoice()
+
+        voice:activateResponseSounds()
+
+        assert.stub(audio.loadSoundFile).was_not_called()
+    end)
+
+    it("should release all loaded challenge sounds when deactivated", function()
         local challengeSound1 = createSound()
         local challengeSound2 = createSound()
+        local responseSound = createSound()
+        local failSound = createSound()
+
+        soundLookup["challenges/Challenge1.wav"] = challengeSound1
+        soundLookup["challenges/Challenge2.wav"] = challengeSound2
+        soundLookup["responses/Response.wav"] = responseSound
+        soundLookup["responses/Fail.wav"] = failSound
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge1.wav")
+        voice:addChallengeSoundFile("2", "Challenge2.wav")
+
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:addFailSoundFile("Fail.wav")
+
+        voice:activateChallengeSounds()
+        voice:deactivateChallengeSounds()
+
+        assert.stub(audio.releaseSound).was.called_with(challengeSound1)
+        assert.stub(audio.releaseSound).was.called_with(challengeSound2)
+        assert.stub(audio.releaseSound).was.called(2)
+    end)
+
+    it("should load and release all challenge sounds again when activated and deactivated again", function()
+        soundLookup["challenges/Challenge1.wav"] = createSound()
+        soundLookup["challenges/Challenge2.wav"] = createSound()
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge1.wav")
+        voice:addChallengeSoundFile("2", "Challenge2.wav")
+
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(2)
+        assert.stub(audio.releaseSound).was.called(0)
+
+        voice:deactivateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(2)
+        assert.stub(audio.releaseSound).was.called(2)
+
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(4)
+        assert.stub(audio.releaseSound).was.called(2)
+
+        voice:deactivateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(4)
+        assert.stub(audio.releaseSound).was.called(4)
+    end)
+
+    it("should not throw an error if there are no challenge sounds to release", function()
+        local voice = createVoice()
+
+        voice:activateChallengeSounds()
+        voice:deactivateChallengeSounds()
+
+        assert.stub(audio.releaseSound).was_not_called()
+    end)
+
+    it("should release all loaded response and fail sounds when deactivated", function()
+        local challengeSound = createSound()
         local responseSound1 = createSound()
         local responseSound2 = createSound()
         local failSound1 = createSound()
         local failSound2 = createSound()
 
-        soundLookup["challenges/Challenge1.wav"] = challengeSound1
-        soundLookup["challenges/Challenge2.wav"] = challengeSound2
+        soundLookup["challenges/Challenge.wav"] = challengeSound
         soundLookup["responses/Response1.wav"] = responseSound1
         soundLookup["responses/Response2.wav"] = responseSound2
         soundLookup["responses/Fail1.wav"] = failSound1
@@ -230,8 +329,7 @@ describe("WaveFileVoice", function()
 
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge1.wav")
-        voice:addChallengeSoundFile("2", "Challenge2.wav")
+        voice:addChallengeSoundFile("1", "Challenge.wav")
 
         voice:addResponseSoundFile("One", "Response1.wav")
         voice:addResponseSoundFile("Two", "Response2.wav")
@@ -239,136 +337,88 @@ describe("WaveFileVoice", function()
         voice:addFailSoundFile("Fail1.wav")
         voice:addFailSoundFile("Fail2.wav")
 
-        voice:onActivated()
-        voice:onDeactivated()
+        voice:activateResponseSounds()
+        voice:deactivateResponseSounds()
 
-        assert.stub(audio.releaseSound).was.called_with(challengeSound1)
-        assert.stub(audio.releaseSound).was.called_with(challengeSound2)
         assert.stub(audio.releaseSound).was.called_with(responseSound1)
         assert.stub(audio.releaseSound).was.called_with(responseSound2)
         assert.stub(audio.releaseSound).was.called_with(failSound1)
         assert.stub(audio.releaseSound).was.called_with(failSound2)
-        assert.stub(audio.releaseSound).was.called(6)
+        assert.stub(audio.releaseSound).was.called(4)
     end)
 
-    it("should load and release all sounds again when activated and deactivated again", function()
-        soundLookup["challenges/Challenge.wav"] = createSound()
+    it("should load and release all release and fail sounds again when activated and deactivated again", function()
         soundLookup["responses/Response.wav"] = createSound()
         soundLookup["responses/Fail.wav"] = createSound()
 
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
 
-        assert.stub(audio.loadSoundFile).was.called(3)
+        assert.stub(audio.loadSoundFile).was.called(2)
         assert.stub(audio.releaseSound).was.called(0)
 
-        voice:onDeactivated()
+        voice:deactivateResponseSounds()
 
-        assert.stub(audio.loadSoundFile).was.called(3)
-        assert.stub(audio.releaseSound).was.called(3)
-
-        voice:onActivated()
-
-        assert.stub(audio.loadSoundFile).was.called(6)
-        assert.stub(audio.releaseSound).was.called(3)
-
-        voice:onDeactivated()
-
-        assert.stub(audio.loadSoundFile).was.called(6)
-        assert.stub(audio.releaseSound).was.called(6)
-    end)
-
-    it("should not throw an error if there are no sounds to release", function()
-        local voice = createVoice()
-
-        voice:onActivated()
-        voice:onDeactivated()
-
-        assert.stub(audio.releaseSound).was_not_called()
-    end)
-
-    it("should not throw an error if there are no challenge sounds to release", function()
-        soundLookup["responses/Response.wav"] = createSound()
-        soundLookup["responses/Fail.wav"] = createSound()
-
-        local voice = createVoice()
-
-        voice:addResponseSoundFile("One", "Response.wav")
-        voice:addFailSoundFile("Fail.wav")
-
-        voice:onActivated()
-        voice:onDeactivated()
-
+        assert.stub(audio.loadSoundFile).was.called(2)
         assert.stub(audio.releaseSound).was.called(2)
+
+        voice:activateResponseSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(4)
+        assert.stub(audio.releaseSound).was.called(2)
+
+        voice:deactivateResponseSounds()
+
+        assert.stub(audio.loadSoundFile).was.called(4)
+        assert.stub(audio.releaseSound).was.called(4)
     end)
 
     it("should not throw an error if there are no response sounds to release", function()
-        soundLookup["challenges/Challenge.wav"] = createSound()
         soundLookup["responses/Fail.wav"] = createSound()
 
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
-        voice:onDeactivated()
+        voice:activateResponseSounds()
+        voice:deactivateResponseSounds()
 
-        assert.stub(audio.releaseSound).was.called(2)
+        assert.stub(audio.releaseSound).was.called(1)
     end)
 
     it("should not throw an error if there are no fail sounds to release", function()
-        soundLookup["challenges/Challenge.wav"] = createSound()
         soundLookup["responses/Response.wav"] = createSound()
 
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
-        voice:onDeactivated()
+        voice:activateResponseSounds()
+        voice:deactivateResponseSounds()
 
-        assert.stub(audio.releaseSound).was.called(2)
+        assert.stub(audio.releaseSound).was.called(1)
     end)
 
-    it("should not throw an error if the voice was not activated", function()
+    it("should not throw an error if there are no response and fail sounds to release", function()
         local voice = createVoice()
 
-        voice:onDeactivated()
+        voice:activateResponseSounds()
+        voice:deactivateResponseSounds()
 
         assert.stub(audio.releaseSound).was_not_called()
     end)
 
-    it("should stop the active sound if it is deactivated", function()
-        local voice = createVoice()
-        local challengeSound = createSound()
-        local responseSound = createSound()
-
-        stub.new(challengeSound, "play")
-        stub.new(challengeSound, "stop")
-        stub.new(responseSound, "play")
-        stub.new(responseSound, "stop")
-
-        soundLookup["challenges/Challenge.wav"] = challengeSound
-        soundLookup["responses/Response.wav"] = responseSound
-
+    it("should not throw an error if the voice if the voice is deactivated but was not activated", function()
         local voice = createVoice()
 
-        voice:addChallengeSoundFile("1", "Challenge.wav")
-        voice:addResponseSoundFile("One", "Response.wav")
+        voice:deactivateChallengeSounds()
+        voice:deactivateResponseSounds()
 
-        voice:onActivated()
-        voice:playChallengeSound("1")
-        voice:onDeactivated()
-
-        assert.stub(challengeSound.stop).was.called(1)
-        assert.stub(responseSound.stop).was_not_called()
+        assert.stub(audio.releaseSound).was_not_called()
     end)
 
     it("should play the correct challenge sound", function()
@@ -385,7 +435,8 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge1.wav")
         voice:addChallengeSoundFile("2", "Challenge2.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+
         voice:playChallengeSound("2")
 
         assert.stub(challengeSound1.play).was_not_called()
@@ -406,7 +457,8 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("One", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+
         voice:playChallengeSound("One")
 
         assert.stub(challengeSound.play).was.called(1)
@@ -424,7 +476,8 @@ describe("WaveFileVoice", function()
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+
         voice:playChallengeSound("1")
         voice:playChallengeSound("1")
 
@@ -448,7 +501,8 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge1.wav")
         voice:addChallengeSoundFile("2", "Challenge2.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+
         voice:playChallengeSound("1")
         voice:playChallengeSound("2")
 
@@ -474,7 +528,9 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+
         voice:playResponseSound("One")
         voice:playChallengeSound("1")
 
@@ -498,7 +554,9 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+
         voice:playFailSound()
         voice:playChallengeSound("1")
 
@@ -520,7 +578,8 @@ describe("WaveFileVoice", function()
         voice:addResponseSoundFile("One", "Response1.wav")
         voice:addResponseSoundFile("Two", "Response2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playResponseSound("Two")
 
         assert.stub(responseSound1.play).was_not_called()
@@ -541,7 +600,9 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("One", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+
         voice:playResponseSound("One")
 
         assert.stub(challengeSound.play).was_not_called()
@@ -559,7 +620,8 @@ describe("WaveFileVoice", function()
 
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playResponseSound("One")
         voice:playResponseSound("One")
 
@@ -583,7 +645,9 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+
         voice:playChallengeSound("1")
         voice:playResponseSound("One")
 
@@ -607,7 +671,8 @@ describe("WaveFileVoice", function()
         voice:addResponseSoundFile("One", "Response1.wav")
         voice:addResponseSoundFile("Two", "Response2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playResponseSound("One")
         voice:playResponseSound("Two")
 
@@ -633,7 +698,8 @@ describe("WaveFileVoice", function()
         voice:addResponseSoundFile("1", "Response.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playFailSound()
         voice:playResponseSound("1")
 
@@ -655,7 +721,7 @@ describe("WaveFileVoice", function()
         voice:addFailSoundFile("Fail1.wav")
         voice:addFailSoundFile("Fail2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
 
         randomResult = 2
         voice:playFailSound()
@@ -675,7 +741,8 @@ describe("WaveFileVoice", function()
 
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playFailSound()
         voice:playFailSound()
 
@@ -699,7 +766,9 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+
         voice:playChallengeSound("1")
         voice:playFailSound()
 
@@ -723,7 +792,8 @@ describe("WaveFileVoice", function()
         voice:addResponseSoundFile("One", "Response.wav")
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playResponseSound("One")
         voice:playFailSound()
 
@@ -749,7 +819,8 @@ describe("WaveFileVoice", function()
         voice:addFailSoundFile("Fail1.wav")
         voice:addFailSoundFile("Fail2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
+
         voice:playFailSound()
 
         randomResult = 2
@@ -769,9 +840,9 @@ describe("WaveFileVoice", function()
 
     it("should throw an error if a sound is played and the voice is not activated", function()
         local voice = createVoice()
-        assert.has_error(function() voice:playChallengeSound("") end, "voice 'Patrick' was not activated")
-        assert.has_error(function() voice:playResponseSound("") end, "voice 'Patrick' was not activated")
-        assert.has_error(function() voice:playFailSound() end, "voice 'Patrick' was not activated")
+        assert.has_error(function() voice:playChallengeSound("") end, "voice 'Patrick' was not activated for the challenges")
+        assert.has_error(function() voice:playResponseSound("") end, "voice 'Patrick' was not activated for the responses")
+        assert.has_error(function() voice:playFailSound() end, "voice 'Patrick' was not activated for the responses")
     end)
 
     it("should pause and resume the active challenge sound", function()
@@ -785,7 +856,7 @@ describe("WaveFileVoice", function()
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
         voice:pause()
 
@@ -808,7 +879,7 @@ describe("WaveFileVoice", function()
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
         voice:pause()
         voice:pause()
@@ -827,7 +898,7 @@ describe("WaveFileVoice", function()
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
         voice:pause()
         voice:resume()
@@ -852,7 +923,7 @@ describe("WaveFileVoice", function()
         voice:addChallengeSoundFile("1", "Challenge1.wav")
         voice:addChallengeSoundFile("2", "Challenge2.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
         voice:pause()
         voice:playChallengeSound("2")
@@ -871,7 +942,7 @@ describe("WaveFileVoice", function()
 
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playResponseSound("One")
         voice:pause()
 
@@ -894,7 +965,7 @@ describe("WaveFileVoice", function()
 
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playResponseSound("One")
         voice:pause()
         voice:pause()
@@ -913,7 +984,7 @@ describe("WaveFileVoice", function()
 
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playResponseSound("One")
         voice:pause()
         voice:resume()
@@ -938,7 +1009,7 @@ describe("WaveFileVoice", function()
         voice:addResponseSoundFile("1", "Response1.wav")
         voice:addResponseSoundFile("2", "Response2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playResponseSound("1")
         voice:pause()
         voice:playResponseSound("2")
@@ -957,7 +1028,7 @@ describe("WaveFileVoice", function()
 
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playFailSound()
         voice:pause()
 
@@ -980,7 +1051,7 @@ describe("WaveFileVoice", function()
 
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playFailSound()
         voice:pause()
         voice:pause()
@@ -999,7 +1070,7 @@ describe("WaveFileVoice", function()
 
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playFailSound()
         voice:pause()
         voice:resume()
@@ -1024,7 +1095,7 @@ describe("WaveFileVoice", function()
         voice:addFailSoundFile("Fail1.wav")
         voice:addFailSoundFile("Fail2.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playFailSound()
         voice:pause()
         randomResult = 2
@@ -1045,7 +1116,7 @@ describe("WaveFileVoice", function()
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
         voice:resume()
 
@@ -1053,15 +1124,41 @@ describe("WaveFileVoice", function()
         assert.stub(challengeSound.stop).was_not_called()
     end)
 
-    it("should not throw an error if the voice is paused when there is no active sound", function()
+    it("should not throw an error if the voice is paused when there is no active challenge sound", function()
         local voice = createVoice()
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:pause()
     end)
 
-    it("should not throw an error if the voice is resumed when there is no active sound", function()
+    it("should not throw an error if the voice is paused when there is no active response sound", function()
         local voice = createVoice()
-        voice:onActivated()
+        voice:activateResponseSounds()
+        voice:pause()
+    end)
+
+    it("should not throw an error if the voice is paused when there is no active challenge or response sound", function()
+        local voice = createVoice()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+        voice:pause()
+    end)
+
+    it("should not throw an error if the voice is resumed when there is no active challenge sound", function()
+        local voice = createVoice()
+        voice:activateChallengeSounds()
+        voice:resume()
+    end)
+
+    it("should not throw an error if the voice is resumed when there is no active response sound", function()
+        local voice = createVoice()
+        voice:activateResponseSounds()
+        voice:resume()
+    end)
+
+    it("should not throw an error if the voice is resumed when there is no active challenge or response sound", function()
+        local voice = createVoice()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
         voice:resume()
     end)
 
@@ -1082,7 +1179,7 @@ describe("WaveFileVoice", function()
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
 
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
         voice:stop()
 
@@ -1100,7 +1197,7 @@ describe("WaveFileVoice", function()
 
         voice:addResponseSoundFile("One", "Response.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playResponseSound("One")
         voice:stop()
 
@@ -1118,16 +1215,29 @@ describe("WaveFileVoice", function()
 
         voice:addFailSoundFile("Fail.wav")
 
-        voice:onActivated()
+        voice:activateResponseSounds()
         voice:playFailSound()
         voice:stop()
 
         assert.stub(failSound.stop).was.called(1)
     end)
 
-    it("should not throw an error if the voice is stopped when there is no active sound", function()
+    it("should not throw an error if the voice is stopped when there is no active challenge sound", function()
         local voice = createVoice()
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        voice:stop()
+    end)
+
+    it("should not throw an error if the voice is stopped when there is no active response sound", function()
+        local voice = createVoice()
+        voice:activateResponseSounds()
+        voice:stop()
+    end)
+
+    it("should not throw an error if the voice is stopped when there is no active challenge or response sound", function()
+        local voice = createVoice()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
         voice:stop()
     end)
 
@@ -1136,9 +1246,22 @@ describe("WaveFileVoice", function()
         assert.has_error(function() voice:stop() end, "voice 'Patrick' was not activated")
     end)
 
-    it("should report finished if there is no active sound", function()
+    it("should report finished if there is no active challenge sound", function()
         local voice = createVoice()
-        voice:onActivated()
+        voice:activateChallengeSounds()
+        assert.is_true(voice:isFinished())
+    end)
+
+    it("should report finished if there is no active response sound", function()
+        local voice = createVoice()
+        voice:activateResponseSounds()
+        assert.is_true(voice:isFinished())
+    end)
+
+    it("should report finished if there is no active challenge or response sound", function()
+        local voice = createVoice()
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
         assert.is_true(voice:isFinished())
     end)
 
@@ -1147,7 +1270,7 @@ describe("WaveFileVoice", function()
         assert.is_true(voice:isFinished())
     end)
 
-    it("should only report finished if the active voice is finished", function()
+    it("should only report finished if the active challenge sound is finished", function()
         local voice = createVoice()
         local challengeSound = createSound()
         local finished = true
@@ -1158,8 +1281,29 @@ describe("WaveFileVoice", function()
         soundLookup["challenges/Challenge.wav"] = challengeSound
 
         voice:addChallengeSoundFile("1", "Challenge.wav")
-        voice:onActivated()
+        voice:activateChallengeSounds()
         voice:playChallengeSound("1")
+
+        assert.is_true(voice:isFinished())
+
+        finished = false
+
+        assert.is_false(voice:isFinished())
+    end)
+
+    it("should only report finished if the active response sound is finished", function()
+        local voice = createVoice()
+        local responseSound = createSound()
+        local finished = true
+
+        stub.new(responseSound, "play")
+        stub.new(responseSound, "isFinished", function() return finished end)
+
+        soundLookup["responses/Response.wav"] = responseSound
+
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:activateResponseSounds()
+        voice:playResponseSound("One")
 
         assert.is_true(voice:isFinished())
 

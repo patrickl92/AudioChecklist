@@ -91,8 +91,8 @@ function sopExecutor.setActiveSOP(sop)
     if activeSOP then
         utils.logDebug("SopExecutor", "Deactivating SOP '" .. activeSOP:getName() .. "'")
 
-        challengeVoice:onDeactivated()
-        responseVoice:onDeactivated()
+        challengeVoice:deactivateChallengeSounds()
+        responseVoice:deactivateResponseSounds()
         activeSOP:reset()
         activeSOP:onDeactivated()
         executeCallbacks(sopDeactivatedCallbacks, activeSOP)
@@ -125,8 +125,8 @@ function sopExecutor.setActiveSOP(sop)
         utils.logDebug("SopExecutor", "Challenge voice: '" .. challengeVoice:getName() .. "'")
         utils.logDebug("SopExecutor", "Response voice: '" .. responseVoice:getName() .. "'")
 
-        challengeVoice:onActivated()
-        responseVoice:onActivated()
+        challengeVoice:activateChallengeSounds()
+        responseVoice:activateResponseSounds()
         activeSOP:onActivated()
         executeCallbacks(sopActivatedCallbacks, activeSOP)
     end
