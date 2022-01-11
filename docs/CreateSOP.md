@@ -8,6 +8,10 @@
 
 Check out the [LDoc](https://patrickl92.github.io/AudioChecklist/ldoc/) page for the provided classes.
 
+## First step
+
+Create a `.lua` file (e.g. `MySOP.lua`) in the `<X-Plane 11>/Resources/plugins/FlyWithLua/Scripts` folder. This file is loaded automatically when an aircraft is loaded in X-Plane. Add the code which is required for your SOP in this file.
+
 ## Standard operating procedure
 
 The user needs to select a SOP in order to use this extensions. It is possible to have multiple SOPs installed, each one with its own set of checklists and voices.
