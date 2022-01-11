@@ -14,3 +14,5 @@ This is a framework for executing checklists in X-Plane, which features:
 The framework itself does not contain any checklists. The available checklists can be downloaded from the official forum at x-plane.org (TODO: create forum page and insert link)
 
 Check out the [usage description](docs/Usage.md) for a detailed overview.
+
+If you want to create your own checklists, follow this [guide](docs/CreateSOP.md).
