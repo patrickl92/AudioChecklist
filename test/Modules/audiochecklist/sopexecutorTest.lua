@@ -384,6 +384,17 @@ describe("SOPExecutor",function()
         sopExecutor.update()
     end)
 
+    it("should not throw an error if the execution is updated and no checklist item is active", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+
+        sop:addChecklist(checklist)
+
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+        sopExecutor.update()
+    end)
+
     it("should execute a checklist item without response", function()
         local sop = createSOP()
         local checklist = createChecklist()

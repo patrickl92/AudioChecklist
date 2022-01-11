@@ -213,6 +213,9 @@ function sopExecutor.update()
     end
 
     local checklistItem = checklist:getActiveItem()
+    if not checklistItem then
+        return
+    end
 
     if checklistItem:getState() == checklistItem.stateNotStarted then
         utils.logDebug("SopExecutor", "Starting execution of checklist item '" .. (checklistItem:getChallengeText() or "<nil>") .. "'")
