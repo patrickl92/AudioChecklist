@@ -18,6 +18,7 @@ local function binToNumber(str)
     return string.byte(str, 1) + string.byte(str, 2) * 256 + string.byte(str, 3) * 65536 + string.byte(str, 4) * 16777216
 end
 
+
 --- Gets the duration of a WAV file.
 -- Source: https://forums.x-plane.org/index.php?/forums/topic/183135-get-wav-file-duration-using-flywithlua/.
 -- @tparam string filePath The path to the sound file.
