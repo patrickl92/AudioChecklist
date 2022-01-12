@@ -19,7 +19,7 @@ jobs:
     - uses: leafo/gh-actions-luarocks@v4
 
     - name: checkout ldoc
-      uses: actions/checkout@v2
+      uses: actions/checkout@master
       with:
         repository: lunarmodules/LDoc
         path: ./ldoc-repo
