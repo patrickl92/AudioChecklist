@@ -21,4 +21,4 @@ jobs:
 
     - name: test
       run: |
-        busted -C ./test/Modules/audiochecklist/ -o TAP -p ".*%.lua" ./
+        busted -C ./test/Modules/audiochecklist/ -o plainTerminal -p ".*%.lua" ./
