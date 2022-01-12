@@ -1,6 +1,6 @@
 # AudioChecklist for X-Plane
 
-[![test](https://github.com/patrickl92/AudioChecklist/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/patrickl92/AudioChecklist/actions/workflows/test.yml)
+[![test](https://github.com/patrickl92/AudioChecklist/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/patrickl92/AudioChecklist/actions/workflows/test.yml) [![generate-ldoc](https://github.com/patrickl92/AudioChecklist/actions/workflows/ldoc.yml/badge.svg?branch=main)](https://github.com/patrickl92/AudioChecklist/actions/workflows/ldoc.yml)
 
 This is a framework for executing checklists in X-Plane, which features:
 * Different sets of checklists for each aircraft
