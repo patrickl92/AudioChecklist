@@ -1,0 +1,46 @@
+name: generate-ldoc
+
+on:
+  push:
+    branches: [main]
+    paths: 'src/**'
+
+jobs:
+  generate-ldoc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - uses: leafo/gh-actions-lua@v8
+      with:
+        luaVersion: "5.3"
+
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: checkout ldoc
+      uses: actions/checkout@v2
+      with:
+        repository: lunarmodules/LDoc
+        path: ./ldoc-repo
+
+    - name: setup
+      run: |
+        luarocks install penlight
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+
+    - name: clean
+      run: |
+        git rm -r ./docs/ldoc/
+        git commit -m "Deleted previous ldoc folder"
+
+    - name: generate
+      run: |
+        lua ./ldoc-repo/ldoc.lua --config ./docs/ldoc_config.ld .
+
+    - name: push
+      run: |
+        git add ./docs/ldoc/
+        git commit -m "Generated LDoc"
+        git push
