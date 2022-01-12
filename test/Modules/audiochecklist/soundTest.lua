@@ -46,7 +46,7 @@ describe("Sound", function()
         assert.spy(stopSpy).was.called(1)
         assert.spy(stopSpy).was.called_with(1)
 
-        assert.spy(playSpy).was.called(1)
+        assert.spy(playSpy).was_not_called(1)
         assert.spy(playSpy).was.called_with(1)
     end)
 
