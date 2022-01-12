@@ -12,6 +12,8 @@ Check out the [LDoc](https://patrickl92.github.io/AudioChecklist/ldoc/) page for
 
 Create a `.lua` file (e.g. `MySOP.lua`) in the `<X-Plane 11>/Resources/plugins/FlyWithLua/Scripts` folder. This file is loaded automatically when an aircraft is loaded in X-Plane. Add the code which is required for your SOP in this file.
 
+You may want to install the [DataRefTool](https://github.com/leecbaker/datareftool) to find out the required DataRefs for your checklists.
+
 ## Standard operating procedure
 
 The user needs to select a SOP in order to use this extensions. It is possible to have multiple SOPs installed, each one with its own set of checklists and voices.
@@ -220,6 +222,35 @@ local manualDynamicResponseChecklistItem = require "audiochecklist.manualdynamic
 -- Create the item and add it to the checklist
 -- The text "__ REQ, __ ONBOARD" will be display in the checklist window, but once completed the response "CHECKED" is played
 preflightChecklist:addItem(manualDynamicResponseChecklistItem:new("FUEL", "__ REQ, __ ONBOARD", "Preflight__Fuel", function() return "CHECKED" end))
+```
+
+## Checking conditions frequently
+
+Some checklist items may require an action to be performed before the checklist item is actually executed (e.g. checking the oxygen). FlyWithLua offers functions to execute code in different intervals. However, the provided code is executed always, despite your SOP not being active. To prevent this, you can add callbacks to your SOP which are only executed if your SOP is active.
+
+```lua
+local oxygenChecked = false
+
+-- Gets called every second
+local function updateDataRefVariablesOften()
+  -- read values which are not changed often (e.g. engines are running)
+end
+
+-- Gets called every frame
+local function updateDataRefVariablesEveryFrame()
+  if not oxygenChecked and (utils.readDataRefFloat("laminar/B738/push_button/oxy_test_cpt_pos") == 1) then
+    -- The oxygon check has been performed
+    oxygenChecked = true
+  end
+end
+
+-- Set the callbacks for the updates
+mySOP:addDoOftenCallback(updateDataRefVariablesOften)
+mySOP:addDoEveryFrameCallback(updateDataRefVariablesEveryFrame)
+
+-- The checklist item just returns the state of the local variable
+-- This allows the oxygen check to be performed any time prior the exection of the checklist item
+preflightChecklist:addItem(automaticChecklistItem:new("OXYGEN", "TESTED, 100%", "Preflight_Oxygen", function() return oxygenChecked end))
 ```
 
 ## Registering the SOP
