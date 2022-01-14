@@ -74,7 +74,7 @@ voice:addResponseSoundFile("On", "Response_On.wav")
 -- Playing sounds is handled by the framework, so you don't need to play any sounds yourself
 
 -- Play the file "path/to/audio/files/Item_Battery.wav"
-voice:playChallengeSound("Item_Start")
+voice:playChallengeSound("Battery")
 
 -- Play the file "path/to/response/files/Response_On.wav"
 voice:playResponseSound("On")
