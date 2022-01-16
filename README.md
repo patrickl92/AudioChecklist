@@ -22,4 +22,4 @@ The framework itself does not contain any checklists. The available checklists c
 
 If you want to create your own checklists, follow this [guide](docs/CreateSOP.md).
 
-[Preview](docs/Preview.mov)
+https://patrickl92.github.io/AudioChecklist/Preview.mp4
