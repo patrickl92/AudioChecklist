@@ -18,8 +18,10 @@ This is a framework for executing checklists in X-Plane, which features:
 
 Check out the [usage description](docs/Usage.md) for a detailed overview.
 
+Take a look at the [preview video](https://patrickl92.github.io/AudioChecklist/Preview.mp4) to see how it looks like.
+
 The framework itself does not contain any checklists. The available checklists can be downloaded from the [SOP github repository](https://github.com/patrickl92/AudioChecklistSOPs)
 
 If you want to create your own checklists, follow this [guide](docs/CreateSOP.md).
 
-https://patrickl92.github.io/AudioChecklist/Preview.mp4
+
