@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><strong>waveFileVoice</strong></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>waveFileVoice</code></h1>
+<p>Implementation of a voice which uses WAVE files as an audio source.</p>
+<p>
+ The sound files have to be mapped to the challenge and response sound keys of the checklist items.</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../classes/voice.html#">voice</a>
+    </ul>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:new">waveFileVoice:new (name, challengeFilesDirectoryPath, responseFilesDirectoryPath)</a></td>
+	<td class="summary">Creates a new voice.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:setVolume">waveFileVoice:setVolume (volume)</a></td>
+	<td class="summary">Sets the volume of the voice.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:activateChallengeSounds">waveFileVoice:activateChallengeSounds ()</a></td>
+	<td class="summary">Gets called when the voice is selected for providing the audio output for the challenges.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:activateResponseSounds">waveFileVoice:activateResponseSounds ()</a></td>
+	<td class="summary">Gets called when the voice is selected for providing the audio output for the responses and failures.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:deactivateChallengeSounds">waveFileVoice:deactivateChallengeSounds ()</a></td>
+	<td class="summary">Gets called when the voice is no longer an active audio provider for the challenges.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:deactivateResponseSounds">waveFileVoice:deactivateResponseSounds ()</a></td>
+	<td class="summary">Gets called when the voice is no longer an active audio provider for the responses and failures.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:playChallengeSound">waveFileVoice:playChallengeSound (key)</a></td>
+	<td class="summary">Starts playing the challenge sound with the specified key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:playResponseSound">waveFileVoice:playResponseSound (key)</a></td>
+	<td class="summary">Starts playing the response sound with the specified key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:playFailSound">waveFileVoice:playFailSound ()</a></td>
+	<td class="summary">Starts playing a random fail sound
+ If the voice is currently paused, then the pause is reset.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:pause">waveFileVoice:pause ()</a></td>
+	<td class="summary">Pauses the active sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:resume">waveFileVoice:resume ()</a></td>
+	<td class="summary">Resumes the active sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:stop">waveFileVoice:stop ()</a></td>
+	<td class="summary">Stops playing the active sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:isFinished">waveFileVoice:isFinished ()</a></td>
+	<td class="summary">Checks whether the active sound has finished playing.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:addChallengeSoundFile">waveFileVoice:addChallengeSoundFile (key, soundFileName)</a></td>
+	<td class="summary">Maps a sound file to a challenge sound key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:addResponseSoundFile">waveFileVoice:addResponseSoundFile (key, soundFileName)</a></td>
+	<td class="summary">Maps a sound file to a response sound key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#waveFileVoice:addFailSoundFile">waveFileVoice:addFailSoundFile (soundFileName)</a></td>
+	<td class="summary">Adds a sound file to the list of fail sounds.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "waveFileVoice:new"></a>
+    <strong>waveFileVoice:new (name, challengeFilesDirectoryPath, responseFilesDirectoryPath)</strong>
+    </dt>
+    <dd>
+    Creates a new voice.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The name of the voice
+        </li>
+        <li><span class="parameter">challengeFilesDirectoryPath</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The path to the directory which contains the challenge sound files. Must not be empty. If this parameter is <code>nil</code>, then no challenge sound files can be added.
+        </li>
+        <li><span class="parameter">responseFilesDirectoryPath</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The path to the directory which contains the response and fail sound files. Must not be empty. If this parameter is <code>nil</code>, then no response or fail sound files can be added.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/waveFileVoice.html#">waveFileVoice</a></span>
+        The created voice
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:setVolume"></a>
+    <strong>waveFileVoice:setVolume (volume)</strong>
+    </dt>
+    <dd>
+    Sets the volume of the voice.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+ This function should be implemented in a derived voice class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">volume</span>
+            <span class="types"><span class="type">numer</span></span>
+         The volume to use.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:activateChallengeSounds"></a>
+    <strong>waveFileVoice:activateChallengeSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is selected for providing the audio output for the challenges.
+ Can be used to initialize the voice. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:activateResponseSounds"></a>
+    <strong>waveFileVoice:activateResponseSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is selected for providing the audio output for the responses and failures.
+ Can be used to initialize the voice. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:deactivateChallengeSounds"></a>
+    <strong>waveFileVoice:deactivateChallengeSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is no longer an active audio provider for the challenges.
+ Can be used to release any resources. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:deactivateResponseSounds"></a>
+    <strong>waveFileVoice:deactivateResponseSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is no longer an active audio provider for the responses and failures.
+ Can be used to release any resources. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:playChallengeSound"></a>
+    <strong>waveFileVoice:playChallengeSound (key)</strong>
+    </dt>
+    <dd>
+    Starts playing the challenge sound with the specified key.
+ If the voice is currently paused, then the pause is reset.
+ If the key is not mapped to a sound file, then no sound is played.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the challenge sound.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the voice was not activated.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:playResponseSound"></a>
+    <strong>waveFileVoice:playResponseSound (key)</strong>
+    </dt>
+    <dd>
+    Starts playing the response sound with the specified key.
+ If the voice is currently paused, then the pause is reset.
+ If the key is not mapped to a sound file, then no sound is played.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the response sound.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the voice was not activated.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:playFailSound"></a>
+    <strong>waveFileVoice:playFailSound ()</strong>
+    </dt>
+    <dd>
+    Starts playing a random fail sound
+ If the voice is currently paused, then the pause is reset.
+ If the voice does not contain a fail sound, then no sound is played.
+
+
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the voice was not activated.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:pause"></a>
+    <strong>waveFileVoice:pause ()</strong>
+    </dt>
+    <dd>
+    Pauses the active sound.
+ If there is no active sound or the voice is already paused, then this method does nothing.
+
+
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the voice was not activated.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:resume"></a>
+    <strong>waveFileVoice:resume ()</strong>
+    </dt>
+    <dd>
+    Resumes the active sound.
+ If there is no active sound or the voice is not paused, then this method does nothing.
+
+
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the voice was not activated.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:stop"></a>
+    <strong>waveFileVoice:stop ()</strong>
+    </dt>
+    <dd>
+    Stops playing the active sound.
+ If the voice is currently paused, then the pause is reset.
+ If there is no active sound, then this method does nothing.
+
+
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the voice was not activated.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:isFinished"></a>
+    <strong>waveFileVoice:isFinished ()</strong>
+    </dt>
+    <dd>
+    Checks whether the active sound has finished playing.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if there is no active sound or the active sound has finished playing, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:addChallengeSoundFile"></a>
+    <strong>waveFileVoice:addChallengeSoundFile (key, soundFileName)</strong>
+    </dt>
+    <dd>
+    Maps a sound file to a challenge sound key.
+ The sound cannot be used until the voice has been activated after the sound has been added.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The challenge sound key.
+        </li>
+        <li><span class="parameter">soundFileName</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The name of the sound file.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the path to the directory which contains the challenge sound files was not set.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:addResponseSoundFile"></a>
+    <strong>waveFileVoice:addResponseSoundFile (key, soundFileName)</strong>
+    </dt>
+    <dd>
+    Maps a sound file to a response sound key.
+ The sound cannot be used until the voice has been activated after the sound has been added.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The challenge sound key.
+        </li>
+        <li><span class="parameter">soundFileName</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The name of the sound file.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the path to the directory which contains the response and fail sound files was not set.
+
+
+
+</dd>
+    <dt>
+    <a name = "waveFileVoice:addFailSoundFile"></a>
+    <strong>waveFileVoice:addFailSoundFile (soundFileName)</strong>
+    </dt>
+    <dd>
+    Adds a sound file to the list of fail sounds.
+ The sound cannot be used until the voice has been activated after the sound has been added.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">soundFileName</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The name of the sound file.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the path to the directory which contains the response and fail sound files was not set.
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-01-18 21:26:30 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
