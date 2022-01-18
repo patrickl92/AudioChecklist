@@ -557,7 +557,7 @@ function AudioChecklist_preferencesWindowOnRender()
 		end
 	end
 	
-	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
+	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
 	
 	local responseDelayChanged, responseDelayValue = imgui.SliderFloat("Response Delay", sopExecutor.getResponseDelay(), 0, 1, "%.1f seconds")
 	if responseDelayChanged then
@@ -621,7 +621,7 @@ end
 function AudioChecklist_showPreferencesWindow()
 	if preferencesWindow == nil then
 		local windowWidth = 356
-		local windowHeight = 95
+		local windowHeight = 90
 		
 		-- Create the window
 		preferencesWindow = float_wnd_create(windowWidth, windowHeight, 1, true)
@@ -694,6 +694,7 @@ function AudioChecklist_showChecklistWindow()
 			-- check whether the window is still inside the X-Plane window
 			if checklistWindowLeft >= xPlaneWindowLeft and checklistWindowLeft < (xPlaneWindowRight - 20) and checklistWindowTop <= xPlaneWindowTop and checklistWindowTop >= (xPlaneWindowBottom + 20) then
 				-- Restore the previous position of the window
+				float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
 			end
 		
 			lastChecklistWindowPosition = nil
