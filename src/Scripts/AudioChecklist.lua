@@ -26,6 +26,9 @@ local buttonColorGreenActive = 0xFF079600
 local buttonColorDefaultDisabled = 0x806F4624
 local buttonColorGreenDisabled = 0x80267F00
 
+-- Define the variables used for displaying the preferences window
+local preferencesWindow = nil
+
 -- Define the variables used for displaying the checklist window
 local checklistWindowOpen = false
 local checklistWindow = nil
@@ -230,7 +233,7 @@ local function updateChecklistWindowSize()
 			
 	-- Update the size of the window and prevent resizing
 	float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowLeft + requiredWidth, checklistWindowTop - requiredHeight)
-	float_wnd_set_resizing_limits (checklistWindow, requiredWidth, requiredHeight, requiredWidth, requiredHeight)
+	float_wnd_set_resizing_limits(checklistWindow, requiredWidth, requiredHeight, requiredWidth, requiredHeight)
 end
 
 --- Renders the menu for selecting a standard operating procedure.
@@ -538,6 +541,37 @@ local function renderChecklist(checklist)
 	end
 end
 
+--- Callback function to render the content of the preferences window.
+function AudioChecklist_preferencesWindowOnRender()
+	imgui.SetCursorPosX(10)
+	imgui.SetCursorPosY(10)
+	
+	local autoDoneChanged, autoDoneValue = imgui.Checkbox("Enable Auto Done", sopExecutor.autoDoneEnabled())
+	if autoDoneChanged then
+		if autoDoneValue then
+			sopExecutor.enableAutoDone()
+			preferences.set("AutoDoneEnabled", "1")
+		else
+			sopExecutor.disableAutoDone()
+			preferences.set("AutoDoneEnabled", "0")
+		end
+	end
+	
+	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
+	
+	local responseDelayChanged, responseDelayValue = imgui.SliderFloat("Response Delay", sopExecutor.getResponseDelay(), 0, 1, "%.1f seconds")
+	if responseDelayChanged then
+		sopExecutor.setResponseDelay(responseDelayValue)
+		preferences.set("ResponseDelay", tostring(responseDelayValue))
+	end
+	
+	local nextChecklistItemDelayChanged, nextChecklistItemDelayValue = imgui.SliderFloat("Next Item Delay", sopExecutor.getNextChecklistItemDelay(), 0, 1, "%.1f seconds")
+	if nextChecklistItemDelayChanged then
+		sopExecutor.setNextChecklistItemDelay(nextChecklistItemDelayValue)
+		preferences.set("NextItemDelay", tostring(nextChecklistItemDelayValue))
+	end
+end
+
 --- Callback function to render the content of the checklist window.
 function AudioChecklist_checklistWindowOnRender()
 	checklistWindowOpen = true
@@ -575,6 +609,39 @@ function AudioChecklist_checklistWindowOnRender()
 		end
 	else
 		renderSopMenu()
+	end
+end
+
+--- Callback function to reset the variables for the preferences window.
+function AudioChecklist_preferencesWindowOnClosed()
+	preferencesWindow = nil
+end
+
+--- Shows the preferences window if it is not already visible.
+function AudioChecklist_showPreferencesWindow()
+	if preferencesWindow == nil then
+		local windowWidth = 356
+		local windowHeight = 95
+		
+		-- Create the window
+		preferencesWindow = float_wnd_create(windowWidth, windowHeight, 1, true)
+		
+		-- Set the window title
+		float_wnd_set_title(preferencesWindow, "Audio Checklist - Preferences")
+		
+		-- Set the callback functions
+		float_wnd_set_onclose(preferencesWindow, "AudioChecklist_preferencesWindowOnClosed")
+		float_wnd_set_imgui_builder(preferencesWindow, "AudioChecklist_preferencesWindowOnRender")
+		
+		-- Prevent resizing
+		float_wnd_set_resizing_limits(preferencesWindow, windowWidth, windowHeight, windowWidth, windowHeight)
+		
+		-- Center window on screen
+		local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
+		local screenWidth = xPlaneWindowRight - xPlaneWindowLeft
+		local sceenHeight = xPlaneWindowTop - xPlaneWindowBottom
+		
+		float_wnd_set_geometry(preferencesWindow, xPlaneWindowLeft + (screenWidth - windowWidth) / 2, xPlaneWindowBottom + (sceenHeight - windowHeight) / 2, xPlaneWindowLeft + (screenWidth + windowWidth) / 2, xPlaneWindowBottom + (sceenHeight + windowHeight) / 2)
 	end
 end
 
@@ -627,7 +694,6 @@ function AudioChecklist_showChecklistWindow()
 			-- check whether the window is still inside the X-Plane window
 			if checklistWindowLeft >= xPlaneWindowLeft and checklistWindowLeft < (xPlaneWindowRight - 20) and checklistWindowTop <= xPlaneWindowTop and checklistWindowTop >= (xPlaneWindowBottom + 20) then
 				-- Restore the previous position of the window
-				float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
 			end
 		
 			lastChecklistWindowPosition = nil
@@ -684,18 +750,6 @@ function AudioChecklist_setCurrentChecklistItemDone()
 	end
 end
 
---- Enables the automatic completion of manual checklist items.
-function AudioChecklist_enableAutoDone()
-	sopExecutor.enableAutoDone()
-	preferences.set("AutoDoneEnabled", "1")
-end
-
---- Disables the automatic completion of manual checklist items.
-function AudioChecklist_disableAutoDone()
-	sopExecutor.disableAutoDone()
-	preferences.set("AutoDoneEnabled", "0")
-end
-
 --- Resets the active SOP.
 -- This allows to select another SOP or different voices.
 function AudioChecklist_resetSOP()
@@ -729,21 +783,23 @@ preferences.load(SCRIPT_DIRECTORY .. "AudioChecklist.prefs")
 do_on_exit("AudioChecklist_savePreferences()")
 
 -- Set the callback functions
-do_often("AudioChecklist_updateChecklist()")
+do_every_frame("AudioChecklist_updateChecklist()")
 do_often("AudioChecklist_doOften()")
 do_every_frame("AudioChecklist_doEveryFrame()")
 
 -- Check whether automatic completion of checklist items which requires a manual check should be enabled
-local autoDoneState = "deactivate"
 if preferences.get("AutoDoneEnabled", "0") == "1" then
-	autoDoneState = "activate"
 	sopExecutor.enableAutoDone()
 end
+
+-- Set the configured delays
+sopExecutor.setResponseDelay(tonumber(preferences.get("ResponseDelay", "0.3")))
+sopExecutor.setNextChecklistItemDelay(tonumber(preferences.get("NextItemDelay", "0.3")))
 
 -- Add the provided macros and commands
 add_macro("Audio Checklist: Show Window", "AudioChecklist_showChecklistWindow()")
 add_macro("Audio Checklist: Switch SOP", "AudioChecklist_resetSOP()")
-add_macro("Audio Checklist: Enable Auto Done", "AudioChecklist_enableAutoDone()", "AudioChecklist_disableAutoDone()", autoDoneState)
+add_macro("Audio Checklist: Preferences", "AudioChecklist_showPreferencesWindow()")
 
 -- Only for debugging
 --add_macro("Audio Checklist: Clear Preferences", "AudioChecklist_clearPreferences()")

@@ -1,5 +1,6 @@
 describe("Sound", function()
     local sound
+    local utils
     local currentTime
 
     local function createSound()
@@ -7,18 +8,19 @@ describe("Sound", function()
     end
 
     setup(function()
-        stub.new(os, "time", function() return currentTime end)
-
         sound = require "audiochecklist.sound"
+        utils = require "audiochecklist.utils"
 
         _G.play_sound = function(soundTableEntry) end
         _G.pause_sound = function(soundTableEntry) end
         _G.stop_sound = function(soundTableEntry) end
+
+        stub.new(utils, "getTime", function() return currentTime end)
     end)
 
     teardown(function()
         sound = nil
-        os.time:revert()
+        utils = nil
     end)
 
     before_each(function()

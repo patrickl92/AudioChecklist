@@ -1,1 +1,1 @@
-package.path = package.path .. ";../../../src/Modules/?.lua;"
+package.path = "../../../src/Modules/?.lua;../../fakes/?.lua;" .. package.path

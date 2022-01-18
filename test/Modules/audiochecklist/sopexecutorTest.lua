@@ -9,6 +9,11 @@ describe("SOPExecutor",function()
     local responseVoice
     local challengeVoiceFinished
     local responseVoiceFinished
+    local currentTime
+
+    local function advanceTime(seconds)
+        currentTime = currentTime + seconds
+    end
 
     local function createSOP()
         local sop = standardOperatingProcedure:new("Test SOP")
@@ -131,7 +136,10 @@ describe("SOPExecutor",function()
         checklistItem = require "audiochecklist.checklistitem"
         voice = require "audiochecklist.voice"
 
+        currentTime = 1
+
         stub.new(utils, "logDebug")
+        stub.new(utils, "getTime", function() return currentTime end)
     end)
 
     teardown(function()
@@ -155,6 +163,11 @@ describe("SOPExecutor",function()
         stub.new(responseVoice, "playResponseSound", function() responseVoiceFinished = false end)
         stub.new(responseVoice, "playFailSound", function() responseVoiceFinished = false end)
         stub.new(responseVoice, "isFinished", function() return responseVoiceFinished end)
+
+        sopExecutor.setResponseDelay(0)
+        sopExecutor.setNextChecklistItemDelay(0)
+
+        advanceTime(1)
     end)
 
     after_each(function()
@@ -450,6 +463,40 @@ describe("SOPExecutor",function()
         assert.is_nil(sop:getActiveChecklist())
     end)
 
+    it("ignores the response delay for a checklist item without response", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem = createSoundChecklistItem()
+
+        checklist:addItem(checklistItem)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setResponseDelay(0.5)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateInProgress, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was_no_called()
+
+        sopExecutor.update()
+        sopExecutor.update()
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateInProgress, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was_no_called()
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was.called(1)
+        assert.stub(responseVoice.playResponseSound).was_not_called()
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.is_nil(sop:getActiveChecklist())
+    end)
+
     it("should not evualuate the conditions of an automatic checklist item while the challenge sound is active", function()
         local sop = createSOP()
         local checklist = createChecklist()
@@ -468,6 +515,39 @@ describe("SOPExecutor",function()
         assert.stub(checklistItem.evaluate).was_not_called()
 
         challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.stub(checklistItem.evaluate).was.called(1)
+    end)
+
+    it("should not evualuate the conditions of an automatic checklist item while the response delay is active", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem = createAutomaticChecklistItem()
+
+        checklist:addItem(checklistItem)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setResponseDelay(0.5)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+        sopExecutor.update()
+        sopExecutor.update()
+
+        assert.stub(checklistItem.evaluate).was_not_called()
+
+        challengeVoiceFinished = true
+        advanceTime(1)
+        sopExecutor.update()
+
+        advanceTime(0.4)
+        sopExecutor.update()
+
+        assert.stub(checklistItem.evaluate).was_not_called()
+
+        advanceTime(0.1)
         sopExecutor.update()
 
         assert.stub(checklistItem.evaluate).was.called(1)
@@ -843,6 +923,54 @@ describe("SOPExecutor",function()
         assert.is_nil(sop:getActiveChecklist())
     end)
 
+    it("should not update a manual checklist item while the response delay is active", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem = createManualChecklistItem()
+
+        checklist:addItem(checklistItem)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setResponseDelay(0.5)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateInProgress, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was_not_called()
+        assert.stub(responseVoice.playResponseSound).was_not_called()
+
+        challengeVoiceFinished = true
+
+        sopExecutor.setCurrentChecklistItemDone()
+        advanceTime(1)
+        sopExecutor.update()
+
+        advanceTime(0.4)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateDoneManually, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was_not_called()
+        assert.stub(responseVoice.playResponseSound).was_not_called()
+
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was.called(1)
+        assert.stub(responseVoice.playResponseSound).was.called(1)
+        assert.stub(responseVoice.playResponseSound).was.called_with(responseVoice, "TheResponseKey")
+        assert.stub(responseVoice.playFailSound).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.is_nil(sop:getActiveChecklist())
+    end)
+
     it("should complete a manual checklist item automatically if enabled", function()
         local sop = createSOP()
         local checklist = createChecklist()
@@ -958,6 +1086,9 @@ describe("SOPExecutor",function()
 
         sopExecutor.update()
 
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
         assert.stub(checklistItem1.onStarted).was.called(1)
         assert.stub(checklistItem2.onStarted).was.called(1)
         assert.stub(checklistItem3.onStarted).was_not_called()
@@ -984,6 +1115,133 @@ describe("SOPExecutor",function()
 
         sopExecutor.update()
 
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+        assert.is_nil(sop:getActiveChecklist())
+    end)
+
+    it("should respect the delays when executing a checklist with multiple items", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem1 = createSoundChecklistItem()
+        local checklistItem2 = createAutomaticChecklistItem()
+        local checklistItem3 = createSoundChecklistItem()
+
+        checklist:addItem(checklistItem1)
+        checklist:addItem(checklistItem2)
+        checklist:addItem(checklistItem3)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setResponseDelay(0.3)
+        sopExecutor.setNextChecklistItemDelay(0.5)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was_not_called()
+        assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.are.equal(checklistItem1, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        advanceTime(0.4)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        advanceTime(1)
+        sopExecutor.update()
+
+        advanceTime(0.2)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        advanceTime(0.4)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
         assert.stub(checklistItem1.onStarted).was.called(1)
         assert.stub(checklistItem2.onStarted).was.called(1)
         assert.stub(checklistItem3.onStarted).was.called(1)
@@ -1153,6 +1411,129 @@ describe("SOPExecutor",function()
         assert.are.equal(checklist.stateCompleted, checklist:getState())
     end)
 
+    it("should adapt the response delay if the execution is paused", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem = createAutomaticChecklistItem()
+
+        checklist:addItem(checklistItem)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setResponseDelay(0.5)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+        challengeVoiceFinished = true
+
+        advanceTime(1)
+        sopExecutor.update()
+
+        sopExecutor.pause()
+
+        assert.stub(challengeVoice.pause).was_not_called()
+        assert.stub(responseVoice.pause).was_not_called()
+
+        responseVoiceFinished = true
+        advanceTime(1)
+        sopExecutor.update()
+
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+
+        advanceTime(1)
+        sopExecutor.resume()
+
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.stub(challengeVoice.resume).was_not_called()
+        assert.stub(responseVoice.resume).was_not_called()
+        assert.stub(responseVoice.playResponseSound).was_not_called()
+
+        advanceTime(0.4)
+        sopExecutor.update()
+
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.stub(challengeVoice.resume).was_not_called()
+        assert.stub(responseVoice.resume).was_not_called()
+        assert.stub(responseVoice.playResponseSound).was_not_called()
+
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.stub(challengeVoice.resume).was_not_called()
+        assert.stub(responseVoice.resume).was_not_called()
+        assert.stub(responseVoice.playResponseSound).was.called(1)
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.stub(responseVoice.playResponseSound).was.called(1)
+    end)
+
+    it("should adapt the next item delay if the execution is paused", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem1 = createSoundChecklistItem()
+        local checklistItem2 = createAutomaticChecklistItem()
+
+        checklist:addItem(checklistItem1)
+        checklist:addItem(checklistItem2)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setNextChecklistItemDelay(0.5)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateInProgress, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.are.equal(checklistItem1, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        sopExecutor.pause()
+
+        advanceTime(1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        sopExecutor.resume()
+
+        advanceTime(0.4)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        advanceTime(0.1)
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+    end)
+
     it("should not pause the execution if no SOP is active", function()
         sopExecutor.pause()
 
@@ -1169,6 +1550,28 @@ describe("SOPExecutor",function()
 
     it("should not throw an error if the execution is resumed but it was not paused", function()
         sopExecutor.resume()
+    end)
+
+    it("should report the state of the Auto Done option", function()
+        assert.is_false(sopExecutor.autoDoneEnabled())
+
+        sopExecutor.enableAutoDone()
+
+        assert.is_true(sopExecutor.autoDoneEnabled())
+
+        sopExecutor.disableAutoDone()
+
+        assert.is_false(sopExecutor.autoDoneEnabled())
+    end)
+
+    it("should report the current response delay", function()
+        sopExecutor.setResponseDelay(0.4)
+        assert.are.equal(0.4, sopExecutor.getResponseDelay())
+    end)
+
+    it("should report the current next item delay", function()
+        sopExecutor.setNextChecklistItemDelay(0.5)
+        assert.are.equal(0.5, sopExecutor.getNextChecklistItemDelay())
     end)
 
     it("should execute the SOP activated callbacks", function()

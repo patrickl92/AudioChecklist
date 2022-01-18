@@ -15,12 +15,18 @@ local utils = require "audiochecklist.utils"
 local audio = require "audiochecklist.audio"
 
 local paused = false
+local pauseStartTime = 0
+
 local activeSOP = nil
 local challengeVoice = nil
 local responseVoice = nil
 local activeVoice = nil
 
 local checklistItemAutoDone = false
+local responseDelay = 0.3
+local nextChecklistItemDelay = 0.3
+local responseDelayFinishedTime = 0
+local nextChecklistItemDelayFinishedTime = 0
 
 local sopActivatedCallbacks = {}
 local sopDeactivatedCallbacks = {}
@@ -217,6 +223,13 @@ function sopExecutor.update()
         return
     end
 
+	if utils.getTime() < nextChecklistItemDelayFinishedTime then
+		-- Wait for the delay between the checklist items to finish
+		return
+	end
+
+    nextChecklistItemDelayFinishedTime = 0
+
     if checklistItem:getState() == checklistItem.stateNotStarted then
         utils.logDebug("SopExecutor", "Starting execution of checklist item '" .. (checklistItem:getChallengeText() or "<nil>") .. "'")
 
@@ -229,9 +242,16 @@ function sopExecutor.update()
 
     -- Wait for the currently played sound to finish
     if not activeVoice or activeVoice:isFinished() then
-        activeVoice = nil
+		if activeVoice and checklistItem:getState() ~= checklistItem.stateSuccess and checklistItem:hasResponse() and responseDelay > 0 then
+			-- Sound has been finished and checklist item has a response
+			responseDelayFinishedTime = utils.getTime() + responseDelay
+		end
 
-        if checklistItem:getState() ~= checklistItem.stateSuccess then
+		activeVoice = nil
+
+        if checklistItem:getState() ~= checklistItem.stateSuccess and utils.getTime() >= responseDelayFinishedTime then
+            responseDelayFinishedTime = 0
+
             if not checklistItem:hasResponse() then
                 utils.logDebug("SopExecutor", "Checklist item does not have a response, setting it to completed")
 
@@ -283,6 +303,10 @@ function sopExecutor.update()
             if checklist:hasNextItem() then
                 -- Move to the next checklist item if there is one
                 checklist:setNextItemActive()
+
+                if nextChecklistItemDelay > 0 then
+				    nextChecklistItemDelayFinishedTime = utils.getTime() + nextChecklistItemDelay
+                end
             else
                 -- Checklist has been completed
                 checklist:setState(checklist.stateCompleted)
@@ -301,6 +325,7 @@ function sopExecutor.pause()
         utils.logDebug("SopExecutor", "Pausing checklist execution")
 
         paused = true
+        pauseStartTime = utils.getTime()
 
         if activeVoice then
             activeVoice:pause()
@@ -315,6 +340,16 @@ function sopExecutor.resume()
         utils.logDebug("SopExecutor", "Resuming checklist execution")
 
         paused = false
+
+        -- Apply the pause duration to the delays
+        local pauseDuration = utils.getTime() - pauseStartTime;
+        if responseDelayFinishedTime > 0 then
+            responseDelayFinishedTime = responseDelayFinishedTime + pauseDuration
+        end
+
+        if nextChecklistItemDelayFinishedTime > 0 then
+            nextChecklistItemDelayFinishedTime = nextChecklistItemDelayFinishedTime + pauseDuration
+        end
 
         if activeVoice then
             activeVoice:resume()
@@ -354,6 +389,45 @@ end
 function sopExecutor.disableAutoDone()
     utils.logDebug("SopExecutor", "Auto completion of manual checklist items disabled")
     checklistItemAutoDone = false
+end
+
+--- Gets a value indicating whether the automatic completion of manual checklist items is currently enabled.
+-- @treturn bool <code>True</code> if the automatic completion of manual checklist items is currently enabled, otherwise <code>false</code>.
+function sopExecutor.autoDoneEnabled()
+	return checklistItemAutoDone
+end
+
+--- Sets the delay for playing the response sound.
+-- This also delays the evaluation of the checklist item.
+-- @tparam number delay The delay to use in seconds. Must be greater or equal to zero.
+function sopExecutor.setResponseDelay(delay)
+	utils.verifyType("delay", delay, "number")
+	if delay < 0 then error ("Delay must be greater or equal to zero") end
+
+    utils.logDebug("SopExecutor", "Set response delay: " .. tostring(delay))
+	responseDelay = delay
+end
+
+--- Gets the delay for playing the response sound.
+-- @treturn number The currently used delay.
+function sopExecutor.getResponseDelay()
+	return responseDelay
+end
+
+--- Sets the delay for the execution of the next checklist item.
+-- @tparam number delay The delay to use in seconds. Must be greater or equal to zero.
+function sopExecutor.setNextChecklistItemDelay(delay)
+	utils.verifyType("delay", delay, "number")
+	if delay < 0 then error ("Delay must be greater or equal to zero") end
+
+    utils.logDebug("SopExecutor", "Set response delay: " .. tostring(delay))
+	nextChecklistItemDelay = delay
+end
+
+--- Gets the delay for the execution of the next checklist item.
+-- @treturn number The currently used delay.
+function sopExecutor.getNextChecklistItemDelay()
+	return nextChecklistItemDelay
 end
 
 --- Adds a callback which is executed if a SOP is activated.

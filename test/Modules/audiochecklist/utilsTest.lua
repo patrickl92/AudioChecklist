@@ -1,5 +1,6 @@
 describe("Utils", function()
     local utils
+    local socket
     local findDataRef
     local dataRefLookup
     local dataRefValues
@@ -53,6 +54,7 @@ describe("Utils", function()
         end
 
         utils = require "audiochecklist.utils"
+        socket = require "socket"
     end)
 
     teardown(function()
@@ -87,19 +89,25 @@ describe("Utils", function()
             utils.disableDebugLogging()
         end)
 
+        socket.time = 2107.17
+
         utils.enableDebugLogging()
         utils.logDebug("Test", "My debug message")
-        assert.stub(_G.logMsg).was.called_with("AudioChecklist.Test [DEBUG]: My debug message")
+        assert.stub(_G.logMsg).was.called_with("2107.17 AudioChecklist.Test [DEBUG]: My debug message")
     end)
 
     it("should write an information log message", function()
+        socket.time = 2107.17
+
         utils.logInfo("Test", "My information message")
-        assert.stub(_G.logMsg).was.called_with("AudioChecklist.Test [INFO]: My information message")
+        assert.stub(_G.logMsg).was.called_with("2107.17 AudioChecklist.Test [INFO]: My information message")
     end)
 
     it("should write an error log message", function()
+        socket.time = 2107.17
+
         utils.logError("Test", "My error message")
-        assert.stub(_G.logMsg).was.called_with("AudioChecklist.Test [ERROR]: My error message")
+        assert.stub(_G.logMsg).was.called_with("2107.17 AudioChecklist.Test [ERROR]: My error message")
     end)
 
     it("should verify a type", function()
@@ -134,6 +142,12 @@ describe("Utils", function()
 
         assert.has_error(function() utils.verifyNotNil(nil, "") end, "valueName must be a string")
         assert.has_error(function() utils.verifyNotNil(0, "") end, "valueName must be a string")
+    end)
+
+    it("should return the correct time", function()
+        socket.time = 2107.17
+
+        assert.are.equal(2107.17, utils.getTime())
     end)
 
     it("should check whether a file exists", function()

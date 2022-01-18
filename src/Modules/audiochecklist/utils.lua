@@ -3,6 +3,9 @@
 -- @author Patrick Lang
 -- @copyright 2022 Patrick Lang
 local utils = {}
+
+local socket = require "socket"
+
 local dataRefLookup = {}
 local missingDataRefLogged = {}
 local debugLoggingEnabled = false
@@ -16,7 +19,7 @@ local function logMessage(source, severity, message)
     utils.verifyType("severity", severity, "string")
     utils.verifyType("message", message, "string")
 
-    logMsg("AudioChecklist." .. source .. " [" .. severity .. "]: " .. message)
+    logMsg(tostring(utils.getTime()) .. " AudioChecklist." .. source .. " [" .. severity .. "]: " .. message)
 end
 
 --- Gets a XPlane DataRef reference
@@ -94,6 +97,13 @@ function utils.verifyNotNil(valueName, value)
     if value == nil then
         error(valueName .. " must not be nil")
     end
+end
+
+--- Gets the current time.
+-- The function uses the <code>gettime()</code> function of LuaSocket, which provides the current time with milliseconds resolution.
+-- @treturn number The current time.
+function utils.getTime()
+	return socket.gettime()
 end
 
 --- Checks whether a file exists

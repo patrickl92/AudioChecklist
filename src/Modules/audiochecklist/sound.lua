@@ -36,13 +36,13 @@ function sound:play()
 
         -- Start playing the sound
         play_sound(self.soundTableEntry)
-        self.endTime = os.time() + self.duration
+        self.endTime = utils.getTime() + self.duration
     else
         -- Resume the sound
         play_sound(self.soundTableEntry)
 
         -- Recalculate the new end time
-        local pauseDuration = os.time() - self.pauseStartTime
+        local pauseDuration = utils.getTime() - self.pauseStartTime
         self.endTime = self.endTime + pauseDuration
         self.pauseStartTime = 0
     end
@@ -53,7 +53,7 @@ end
 function sound:pause()
     if self.pauseStartTime == 0 and not self:isFinished() then
         pause_sound(self.soundTableEntry)
-        self.pauseStartTime = os.time()
+        self.pauseStartTime = utils.getTime()
     end
 end
 
@@ -68,7 +68,7 @@ end
 --- Checks whether the sound has finished playing.
 -- @treturn bool <code>True</code> if the sound has not bee started, is currently paused or has finished playing, otherwise <code>false</code>.
 function sound:isFinished()
-    return self.endTime == 0 or (os.time() > self.endTime and self.pauseStartTime == 0)
+    return self.endTime == 0 or (utils.getTime() > self.endTime and self.pauseStartTime == 0)
 end
 
 --- Gets the reference to the entry in the FlyWithLua sound table.
