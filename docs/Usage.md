@@ -46,11 +46,7 @@ Some items can only be finished manually. In this case, the button `Skip` is ren
 
 ![Manual checklist item](images/ManualChecklistItem.png)
 
-The command `Skip`/`Done` can also be assigned as a keyboard shortcut or joystick button. It is also possible to automatically finish the manual items by activating this option in the menu:
-
-![Enable Auto Done](images/EnableAutoDone.png)
-
-A white dot is displayed if the option is active.
+The command `Skip`/`Done` can also be assigned as a keyboard shortcut or joystick button. It is also possible to automatically finish the manual items by activating this option in the preferences window.
 
 The checklist can be paused by pressing the button `Pause`. The button is then renamed to `Resume`, which resumes the execution of the checklist. If the checklist is paused, the button `Skip` (or `Done`) is disabled and cannot be clicked. Pausing and resuming can also be assigned as a keyboard shortcut or joystick button.
 
@@ -59,6 +55,29 @@ The checklist can be paused by pressing the button `Pause`. The button is then r
 If all checklist items have been finished, the content of the window switches back to the checklist overview. The button `Back` cancels the current checklist and also returns to the checklist overview. If a checklist is paused when being cancelled, the pause is also cancelled.
 
 Each checklist can be repeated as often as needed.
+
+## Preferences
+
+The preferences window can be opened using the menu entry `Plugins > FlyWithLua > FlyWithLua Macros > Audio Checklist: Preferences`:
+
+![Open preferences](images/OpenPreferences.png)
+
+A new window will be opened, which contains all available preferences:
+
+![Preferences](images/Preferences.png)
+
+* Enable Auto Done
+  * If checked, the manual checklist items are finished automatically
+  * Default value: False
+* Response Delay
+  * The delay time in seconds between the challenge sound and the response sound. It is also used as the delay between the fail sound and the response sound, if an automatic checklist item has failed
+  * Default value: 0.3 seconds
+* Next Item Delay
+  * The delay time in seconds between the response sound of the previous checklist item and the challenge sound of the current checklist item
+  * Default value: 0.3 seconds
+* Volume
+  * Sets the volume of the challenge and response sounds
+  * Default value: 100 %
 
 ## Limitations
 * Hitting the assigned key or joystick button to show the checklist window is not always recognized if it is done multiple times in a short time period (e.g. closing the window and then immediately opening it again may won’t work).
