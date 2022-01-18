@@ -134,6 +134,34 @@
 	<td class="summary">Disables the automatic completion of manual checklist items.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#autoDoneEnabled">autoDoneEnabled ()</a></td>
+	<td class="summary">Gets a value indicating whether the automatic completion of manual checklist items is currently enabled.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setResponseDelay">setResponseDelay (delay)</a></td>
+	<td class="summary">Sets the delay for playing the response sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getResponseDelay">getResponseDelay ()</a></td>
+	<td class="summary">Gets the delay for playing the response sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setNextChecklistItemDelay">setNextChecklistItemDelay (delay)</a></td>
+	<td class="summary">Sets the delay for the execution of the next checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getNextChecklistItemDelay">getNextChecklistItemDelay ()</a></td>
+	<td class="summary">Gets the delay for the execution of the next checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setVoiceVolume">setVoiceVolume (volume)</a></td>
+	<td class="summary">Sets the volume of the challenge and response voices.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getVoiceVolume">getVoiceVolume ()</a></td>
+	<td class="summary">Gets the volume of the challenge and response voices.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#addSOPActivatedCallback">addSOPActivatedCallback (callback)</a></td>
 	<td class="summary">Adds a callback which is executed if a SOP is activated.</td>
 	</tr>
@@ -400,6 +428,152 @@
 
 </dd>
     <dt>
+    <a name = "autoDoneEnabled"></a>
+    <strong>autoDoneEnabled ()</strong>
+    </dt>
+    <dd>
+    Gets a value indicating whether the automatic completion of manual checklist items is currently enabled.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the automatic completion of manual checklist items is currently enabled, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setResponseDelay"></a>
+    <strong>setResponseDelay (delay)</strong>
+    </dt>
+    <dd>
+    Sets the delay for playing the response sound.
+ This also delays the evaluation of the checklist item.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">delay</span>
+            <span class="types"><span class="type">number</span></span>
+         The delay to use in seconds. Must be greater or equal to zero.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getResponseDelay"></a>
+    <strong>getResponseDelay ()</strong>
+    </dt>
+    <dd>
+    Gets the delay for playing the response sound.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The currently used delay.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setNextChecklistItemDelay"></a>
+    <strong>setNextChecklistItemDelay (delay)</strong>
+    </dt>
+    <dd>
+    Sets the delay for the execution of the next checklist item.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">delay</span>
+            <span class="types"><span class="type">number</span></span>
+         The delay to use in seconds. Must be greater or equal to zero.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getNextChecklistItemDelay"></a>
+    <strong>getNextChecklistItemDelay ()</strong>
+    </dt>
+    <dd>
+    Gets the delay for the execution of the next checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The currently used delay.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setVoiceVolume"></a>
+    <strong>setVoiceVolume (volume)</strong>
+    </dt>
+    <dd>
+    Sets the volume of the challenge and response voices.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">volume</span>
+            <span class="types"><span class="type">numer</span></span>
+         The volume to use.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getVoiceVolume"></a>
+    <strong>getVoiceVolume ()</strong>
+    </dt>
+    <dd>
+    Gets the volume of the challenge and response voices.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The currently used volume.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "addSOPActivatedCallback"></a>
     <strong>addSOPActivatedCallback (callback)</strong>
     </dt>
@@ -614,7 +788,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-01-12 20:19:28 </i>
+<i style="float:right;">Last updated 2022-01-18 21:07:16 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
