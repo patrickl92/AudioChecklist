@@ -71,6 +71,103 @@ describe("WaveFileVoice", function()
         assert.has_error(function() waveFileVoice:new("", nil, "") end, "responseFilesDirectoryPath must not be empty")
     end)
 
+    it("should set the volume on the loaded challenge sounds", function()
+        local challengeSound = createSound()
+        local responseSound = createSound()
+        local failSound = createSound()
+
+        soundLookup["challenges/Challenge.wav"] = challengeSound
+        soundLookup["responses/Response.wav"] = responseSound
+        soundLookup["responses/Fail.wav"] = failSound
+
+        stub.new(challengeSound, "setVolume", function(volume) end)
+        stub.new(responseSound, "setVolume", function(volume) end)
+        stub.new(failSound, "setVolume", function(volume) end)
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge.wav")
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:addFailSoundFile("Fail.wav")
+
+        voice:activateChallengeSounds()
+
+        voice:setVolume(0.5)
+
+        assert.stub(challengeSound.setVolume).was.called(1)
+        assert.stub(challengeSound.setVolume).was.called_with(challengeSound, 0.5)
+        assert.stub(responseSound.setVolume).was_not_called()
+        assert.stub(failSound.setVolume).was_not_called()
+    end)
+
+    it("should set the volume on the loaded response sounds", function()
+        local challengeSound = createSound()
+        local responseSound = createSound()
+        local failSound = createSound()
+
+        soundLookup["challenges/Challenge.wav"] = challengeSound
+        soundLookup["responses/Response.wav"] = responseSound
+        soundLookup["responses/Fail.wav"] = failSound
+
+        stub.new(challengeSound, "setVolume", function(volume) end)
+        stub.new(responseSound, "setVolume", function(volume) end)
+        stub.new(failSound, "setVolume", function(volume) end)
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge.wav")
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:addFailSoundFile("Fail.wav")
+
+        voice:activateResponseSounds()
+
+        voice:setVolume(0.5)
+
+        assert.stub(challengeSound.setVolume).was_not_called()
+        assert.stub(responseSound.setVolume).was.called(1)
+        assert.stub(responseSound.setVolume).was.called_with(responseSound, 0.5)
+        assert.stub(failSound.setVolume).was.called(1)
+        assert.stub(failSound.setVolume).was.called_with(failSound, 0.5)
+    end)
+
+    it("should set the volume on the loaded challenge and response sounds", function()
+        local challengeSound = createSound()
+        local responseSound = createSound()
+        local failSound = createSound()
+
+        soundLookup["challenges/Challenge.wav"] = challengeSound
+        soundLookup["responses/Response.wav"] = responseSound
+        soundLookup["responses/Fail.wav"] = failSound
+
+        stub.new(challengeSound, "setVolume", function(volume) end)
+        stub.new(responseSound, "setVolume", function(volume) end)
+        stub.new(failSound, "setVolume", function(volume) end)
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge.wav")
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:addFailSoundFile("Fail.wav")
+
+        voice:activateChallengeSounds()
+        voice:activateResponseSounds()
+
+        voice:setVolume(0.5)
+
+        assert.stub(challengeSound.setVolume).was.called(1)
+        assert.stub(challengeSound.setVolume).was.called_with(challengeSound, 0.5)
+        assert.stub(responseSound.setVolume).was.called(1)
+        assert.stub(responseSound.setVolume).was.called_with(responseSound, 0.5)
+        assert.stub(failSound.setVolume).was.called(1)
+        assert.stub(failSound.setVolume).was.called_with(failSound, 0.5)
+    end)
+
+    it("should throw an error if the volume is invalid", function()
+        local voice = createVoice()
+        assert.has_error(function() voice:setVolume(nil) end, "volume must be a number")
+        assert.has_error(function() voice:setVolume("0.5") end, "volume must be a number")
+    end)
+
     it("should throw an error if challenge sound files are added but the challenge directory is not set", function()
         local voice = waveFileVoice:new("Patrick", nil, "responses")
         assert.has_error(function() voice:addChallengeSoundFile("1", "Challenge.wav") end, "Challenge files directory was not set")
@@ -87,10 +184,20 @@ describe("WaveFileVoice", function()
     end)
 
     it("should load the challenge sounds when activated", function()
-        soundLookup["challenges/Challenge1.wav"] = createSound()
-        soundLookup["challenges/Challenge2.wav"] = createSound()
-        soundLookup["responses/Response.wav"] = createSound()
-        soundLookup["responses/Fail.wav"] = createSound()
+        local challengeSound1 = createSound()
+        local challengeSound2 = createSound()
+        local responseSound = createSound()
+        local failSound = createSound()
+
+        soundLookup["challenges/Challenge1.wav"] = challengeSound1
+        soundLookup["challenges/Challenge2.wav"] = challengeSound2
+        soundLookup["responses/Response.wav"] = responseSound
+        soundLookup["responses/Fail.wav"] = failSound
+
+        stub.new(challengeSound1, "setVolume", function(volume) end)
+        stub.new(challengeSound2, "setVolume", function(volume) end)
+        stub.new(responseSound, "setVolume", function(volume) end)
+        stub.new(failSound, "setVolume", function(volume) end)
 
         local voice = createVoice()
 
@@ -105,6 +212,50 @@ describe("WaveFileVoice", function()
         assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge1.wav")
         assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge2.wav")
         assert.stub(audio.loadSoundFile).was.called(2)
+
+        assert.stub(challengeSound1.setVolume).was_not_called()
+        assert.stub(challengeSound2.setVolume).was_not_called()
+        assert.stub(responseSound.setVolume).was_not_called()
+        assert.stub(failSound.setVolume).was_not_called()
+    end)
+
+    it("should apply the volume when activating the challenge sounds", function()
+        local challengeSound1 = createSound()
+        local challengeSound2 = createSound()
+        local responseSound = createSound()
+        local failSound = createSound()
+
+        soundLookup["challenges/Challenge1.wav"] = challengeSound1
+        soundLookup["challenges/Challenge2.wav"] = challengeSound2
+        soundLookup["responses/Response.wav"] = responseSound
+        soundLookup["responses/Fail.wav"] = failSound
+
+        stub.new(challengeSound1, "setVolume", function(volume) end)
+        stub.new(challengeSound2, "setVolume", function(volume) end)
+        stub.new(responseSound, "setVolume", function(volume) end)
+        stub.new(failSound, "setVolume", function(volume) end)
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge1.wav")
+        voice:addChallengeSoundFile("2", "Challenge2.wav")
+
+        voice:addResponseSoundFile("One", "Response.wav")
+        voice:addFailSoundFile("Fail.wav")
+
+        voice:setVolume(0.5)
+        voice:activateChallengeSounds()
+
+        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge1.wav")
+        assert.stub(audio.loadSoundFile).was.called_with("challenges/Challenge2.wav")
+        assert.stub(audio.loadSoundFile).was.called(2)
+
+        assert.stub(challengeSound1.setVolume).was.called(1)
+        assert.stub(challengeSound1.setVolume).was.called_with(challengeSound1, 0.5)
+        assert.stub(challengeSound2.setVolume).was.called(1)
+        assert.stub(challengeSound2.setVolume).was.called_with(challengeSound2, 0.5)
+        assert.stub(responseSound.setVolume).was_not_called()
+        assert.stub(failSound.setVolume).was_not_called()
     end)
 
     it("should only load existing challenge sounds when activated", function()
@@ -149,12 +300,26 @@ describe("WaveFileVoice", function()
     end)
 
     it("should load the response and fail sounds when activated", function()
-        soundLookup["challenges/Challenge1.wav"] = createSound()
-        soundLookup["challenges/Challenge2.wav"] = createSound()
-        soundLookup["responses/Response1.wav"] = createSound()
-        soundLookup["responses/Response2.wav"] = createSound()
-        soundLookup["responses/Fail1.wav"] = createSound()
-        soundLookup["responses/Fail2.wav"] = createSound()
+        local challengeSound1 = createSound()
+        local challengeSound2 = createSound()
+        local responseSound1 = createSound()
+        local responseSound2 = createSound()
+        local failSound1 = createSound()
+        local failSound2 = createSound()
+
+        soundLookup["challenges/Challenge1.wav"] = challengeSound1
+        soundLookup["challenges/Challenge2.wav"] = challengeSound2
+        soundLookup["responses/Response1.wav"] = responseSound1
+        soundLookup["responses/Response2.wav"] = responseSound2
+        soundLookup["responses/Fail1.wav"] = failSound1
+        soundLookup["responses/Fail2.wav"] = failSound2
+
+        stub.new(challengeSound1, "setVolume", function(volume) end)
+        stub.new(challengeSound2, "setVolume", function(volume) end)
+        stub.new(responseSound1, "setVolume", function(volume) end)
+        stub.new(responseSound2, "setVolume", function(volume) end)
+        stub.new(failSound1, "setVolume", function(volume) end)
+        stub.new(failSound2, "setVolume", function(volume) end)
 
         local voice = createVoice()
 
@@ -174,6 +339,67 @@ describe("WaveFileVoice", function()
         assert.stub(audio.loadSoundFile).was.called_with("responses/Fail1.wav")
         assert.stub(audio.loadSoundFile).was.called_with("responses/Fail2.wav")
         assert.stub(audio.loadSoundFile).was.called(4)
+
+        assert.stub(challengeSound1.setVolume).was_not_called()
+        assert.stub(challengeSound2.setVolume).was_not_called()
+        assert.stub(responseSound1.setVolume).was_not_called()
+        assert.stub(responseSound2.setVolume).was_not_called()
+        assert.stub(failSound1.setVolume).was_not_called()
+        assert.stub(failSound2.setVolume).was_not_called()
+    end)
+
+    it("should apply the volume when activating the response sounds", function()
+        local challengeSound1 = createSound()
+        local challengeSound2 = createSound()
+        local responseSound1 = createSound()
+        local responseSound2 = createSound()
+        local failSound1 = createSound()
+        local failSound2 = createSound()
+
+        soundLookup["challenges/Challenge1.wav"] = challengeSound1
+        soundLookup["challenges/Challenge2.wav"] = challengeSound2
+        soundLookup["responses/Response1.wav"] = responseSound1
+        soundLookup["responses/Response2.wav"] = responseSound2
+        soundLookup["responses/Fail1.wav"] = failSound1
+        soundLookup["responses/Fail2.wav"] = failSound2
+
+        stub.new(challengeSound1, "setVolume", function(volume) end)
+        stub.new(challengeSound2, "setVolume", function(volume) end)
+        stub.new(responseSound1, "setVolume", function(volume) end)
+        stub.new(responseSound2, "setVolume", function(volume) end)
+        stub.new(failSound1, "setVolume", function(volume) end)
+        stub.new(failSound2, "setVolume", function(volume) end)
+
+        local voice = createVoice()
+
+        voice:addChallengeSoundFile("1", "Challenge1.wav")
+        voice:addChallengeSoundFile("2", "Challenge2.wav")
+
+        voice:addResponseSoundFile("One", "Response1.wav")
+        voice:addResponseSoundFile("Two", "Response2.wav")
+
+        voice:addFailSoundFile("Fail1.wav")
+        voice:addFailSoundFile("Fail2.wav")
+
+        voice:setVolume(0.5)
+        voice:activateResponseSounds()
+
+        assert.stub(audio.loadSoundFile).was.called_with("responses/Response1.wav")
+        assert.stub(audio.loadSoundFile).was.called_with("responses/Response2.wav")
+        assert.stub(audio.loadSoundFile).was.called_with("responses/Fail1.wav")
+        assert.stub(audio.loadSoundFile).was.called_with("responses/Fail2.wav")
+        assert.stub(audio.loadSoundFile).was.called(4)
+
+        assert.stub(challengeSound1.setVolume).was_not_called()
+        assert.stub(challengeSound2.setVolume).was_not_called()
+        assert.stub(responseSound1.setVolume).was.called(1)
+        assert.stub(responseSound1.setVolume).was.called_with(responseSound1, 0.5)
+        assert.stub(responseSound2.setVolume).was.called(1)
+        assert.stub(responseSound2.setVolume).was.called_with(responseSound2, 0.5)
+        assert.stub(failSound1.setVolume).was.called(1)
+        assert.stub(failSound1.setVolume).was.called_with(failSound1, 0.5)
+        assert.stub(failSound2.setVolume).was.called(1)
+        assert.stub(failSound2.setVolume).was.called_with(failSound2, 0.5)
     end)
 
     it("should only load existing response and fail sounds when activated", function()

@@ -95,6 +95,7 @@ describe("SOPExecutor",function()
     local function createChallengeVoice()
         local voice = voice:new("TestChallengeVoice")
 
+        stub.new(voice, "setVolume")
         stub.new(voice, "activateChallengeSounds")
         stub.new(voice, "deactivateChallengeSounds")
         stub.new(voice, "activateResponseSounds", function() error("Should not call activateResponseSounds on challenge voice") end)
@@ -113,6 +114,7 @@ describe("SOPExecutor",function()
     local function createResponseVoice()
         local voice = voice:new("TestResponseVoice")
 
+        stub.new(voice, "setVolume")
         stub.new(voice, "activateChallengeSounds", function() error("Should not call activateChallengeSounds on response voice") end)
         stub.new(voice, "deactivateChallengeSounds", function() error("Should not call deactivateChallengeSounds on response voice") end)
         stub.new(voice, "activateResponseSounds")
@@ -1572,6 +1574,51 @@ describe("SOPExecutor",function()
     it("should report the current next item delay", function()
         sopExecutor.setNextChecklistItemDelay(0.5)
         assert.are.equal(0.5, sopExecutor.getNextChecklistItemDelay())
+    end)
+
+    it("should throw an error if the delays are invalid", function()
+        assert.has_error(function() sopExecutor.setResponseDelay(nil) end, "delay must be a number")
+        assert.has_error(function() sopExecutor.setResponseDelay("0.5") end, "delay must be a number")
+        assert.has_error(function() sopExecutor.setResponseDelay(-1) end, "Delay must be greater or equal to zero")
+        assert.has_error(function() sopExecutor.setNextChecklistItemDelay(nil) end, "delay must be a number")
+        assert.has_error(function() sopExecutor.setNextChecklistItemDelay("0.5") end, "delay must be a number")
+        assert.has_error(function() sopExecutor.setNextChecklistItemDelay(-1) end, "Delay must be greater or equal to zero")
+    end)
+
+    it("should set the volume on the active voices", function()
+        local sop = createSOP()
+
+        sopExecutor.setActiveSOP(sop)
+
+        assert.stub(challengeVoice.setVolume).was.called(1)
+        assert.stub(challengeVoice.setVolume).was.called_with(challengeVoice, 1)
+        assert.stub(responseVoice.setVolume).was.called(1)
+        assert.stub(responseVoice.setVolume).was.called_with(responseVoice, 1)
+
+        sopExecutor.setVoiceVolume(0.5)
+
+        assert.stub(challengeVoice.setVolume).was.called(2)
+        assert.stub(challengeVoice.setVolume).was.called_with(challengeVoice, 0.5)
+        assert.stub(responseVoice.setVolume).was.called(2)
+        assert.stub(responseVoice.setVolume).was.called_with(responseVoice, 0.5)
+    end)
+
+    it("should set the volume when activating a SOP", function()
+        local sop = createSOP()
+
+        sopExecutor.setVoiceVolume(0.5)
+        sopExecutor.setActiveSOP(sop)
+
+        assert.stub(challengeVoice.setVolume).was.called(1)
+        assert.stub(challengeVoice.setVolume).was.called_with(challengeVoice, 0.5)
+        assert.stub(responseVoice.setVolume).was.called(1)
+        assert.stub(responseVoice.setVolume).was.called_with(responseVoice, 0.5)
+    end)
+
+    it("should throw an error if the volume is invalid", function()
+        assert.has_error(function() sopExecutor.setVoiceVolume(nil) end, "volume must be a number")
+        assert.has_error(function() sopExecutor.setVoiceVolume("0.5") end, "volume must be a number")
+        assert.has_error(function() sopExecutor.setVoiceVolume(0) end, "Volume must be greater than zero")
     end)
 
     it("should execute the SOP activated callbacks", function()

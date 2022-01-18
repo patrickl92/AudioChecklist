@@ -30,6 +30,13 @@ function voice:getName()
     return self.name
 end
 
+--- Sets the volume of the voice
+-- A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+-- This function should be implemented in a derived voice class.
+-- @tparam numer volume The volume to use.
+function voice:setVolume(volume)
+end
+
 --- Gets called when the voice is selected for providing the audio output for the challenges.
 -- Can be used to initialize the voice. This function does nothing in this implementation.
 function voice:activateChallengeSounds()

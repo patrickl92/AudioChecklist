@@ -28,6 +28,7 @@ describe("Voice", function()
     it("should not throw any error in the default implementations", function()
         local voice = createVoice()
 
+        voice:setVolume(1)
         voice:activateChallengeSounds()
         voice:activateResponseSounds()
         voice:deactivateChallengeSounds()

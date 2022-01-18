@@ -22,6 +22,8 @@ local challengeVoice = nil
 local responseVoice = nil
 local activeVoice = nil
 
+local voiceVolume = 1
+
 local checklistItemAutoDone = false
 local responseDelay = 0.3
 local nextChecklistItemDelay = 0.3
@@ -130,6 +132,9 @@ function sopExecutor.setActiveSOP(sop)
 
         utils.logDebug("SopExecutor", "Challenge voice: '" .. challengeVoice:getName() .. "'")
         utils.logDebug("SopExecutor", "Response voice: '" .. responseVoice:getName() .. "'")
+
+        challengeVoice:setVolume(voiceVolume)
+        responseVoice:setVolume(voiceVolume)
 
         challengeVoice:activateChallengeSounds()
         responseVoice:activateResponseSounds()
@@ -428,6 +433,31 @@ end
 -- @treturn number The currently used delay.
 function sopExecutor.getNextChecklistItemDelay()
 	return nextChecklistItemDelay
+end
+
+--- Sets the volume of the challenge and response voices.
+-- A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+-- @tparam numer volume The volume to use.
+function sopExecutor.setVoiceVolume(volume)
+    utils.verifyType("volume", volume, "number")
+	if volume <= 0 then error ("Volume must be greater than zero") end
+
+    voiceVolume = volume
+
+    if challengeVoice then
+        challengeVoice:setVolume(voiceVolume)
+    end
+
+    if responseVoice then
+        responseVoice:setVolume(voiceVolume)
+    end
+end
+
+--- Gets the volume of the challenge and response voices.
+-- A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+-- @treturn number The currently used volume.
+function sopExecutor.getVoiceVolume()
+	return voiceVolume
 end
 
 --- Adds a callback which is executed if a SOP is activated.

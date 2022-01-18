@@ -11,6 +11,7 @@ describe("Sound", function()
         sound = require "audiochecklist.sound"
         utils = require "audiochecklist.utils"
 
+        _G.set_sound_gain = function(soundTableEntry, volume) end
         _G.play_sound = function(soundTableEntry) end
         _G.pause_sound = function(soundTableEntry) end
         _G.stop_sound = function(soundTableEntry) end
@@ -36,6 +37,22 @@ describe("Sound", function()
 
         assert.are.equal(1, sound:getSoundTableEntry())
         assert.is_true(sound:isFinished())
+    end)
+
+    it("should set the volume", function()
+        local sound = createSound()
+        local volumeSpy = spy.on(_G, "set_sound_gain")
+
+        sound:setVolume(0.5)
+
+        assert.spy(volumeSpy).was.called(1)
+        assert.spy(volumeSpy).was.called_with(1, 0.5)
+    end)
+
+    it("should throw an error if the volume is invalid", function()
+        local sound = createSound()
+        assert.has_error(function() sound:setVolume(nil) end, "volume must be a number")
+        assert.has_error(function() sound:setVolume("0.5") end, "volume must be a number")
     end)
 
     it("should play the sound", function()

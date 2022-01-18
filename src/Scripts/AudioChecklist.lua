@@ -570,6 +570,14 @@ function AudioChecklist_preferencesWindowOnRender()
 		sopExecutor.setNextChecklistItemDelay(nextChecklistItemDelayValue)
 		preferences.set("NextItemDelay", tostring(nextChecklistItemDelayValue))
 	end
+	
+	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
+	
+	local volumeChanged, volumeValue = imgui.SliderFloat("Volume", sopExecutor.getVoiceVolume() * 100, 10, 100, "%10.0f %%")
+	if volumeChanged then
+		sopExecutor.setVoiceVolume(volumeValue / 100)
+		preferences.set("VoiceVolume", tostring(volumeValue / 100))
+	end
 end
 
 --- Callback function to render the content of the checklist window.
@@ -621,7 +629,7 @@ end
 function AudioChecklist_showPreferencesWindow()
 	if preferencesWindow == nil then
 		local windowWidth = 356
-		local windowHeight = 90
+		local windowHeight = 118
 		
 		-- Create the window
 		preferencesWindow = float_wnd_create(windowWidth, windowHeight, 1, true)
@@ -796,6 +804,7 @@ end
 -- Set the configured delays
 sopExecutor.setResponseDelay(tonumber(preferences.get("ResponseDelay", "0.3")))
 sopExecutor.setNextChecklistItemDelay(tonumber(preferences.get("NextItemDelay", "0.3")))
+sopExecutor.setVoiceVolume(tonumber(preferences.get("VoiceVolume", "1")))
 
 -- Add the provided macros and commands
 add_macro("Audio Checklist: Show Window", "AudioChecklist_showChecklistWindow()")

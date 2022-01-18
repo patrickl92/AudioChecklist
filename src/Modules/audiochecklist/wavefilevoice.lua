@@ -94,6 +94,32 @@ function waveFileVoice:new(name, challengeFilesDirectoryPath, responseFilesDirec
     return obj
 end
 
+--- Sets the volume of the voice
+-- A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+-- This function should be implemented in a derived voice class.
+-- @tparam numer volume The volume to use.
+function waveFileVoice:setVolume(volume)
+    utils.verifyType("volume", volume, "number")
+
+    self.volume = volume
+
+    if self.challengesInitialized then
+        for _, sound in pairs(self.challengeSounds) do
+            sound:setVolume(volume)
+        end
+    end
+
+    if self.responsesInitialized then
+        for _, sound in pairs(self.responseSounds) do
+            sound:setVolume(volume)
+        end
+
+        for _, sound in pairs(self.failSounds) do
+            sound:setVolume(volume)
+        end
+    end
+end
+
 --- Gets called when the voice is selected for providing the audio output for the challenges.
 -- Can be used to initialize the voice. This function does nothing in this implementation.
 function waveFileVoice:activateChallengeSounds()
@@ -105,7 +131,13 @@ function waveFileVoice:activateChallengeSounds()
         local fullPath = self.challengeFilesDirectoryPath .. DIRECTORY_SEPARATOR .. soundFileName
 
         if utils.fileExists(fullPath) then
-            self.challengeSounds[key] = audio.loadSoundFile(fullPath)
+            local sound = audio.loadSoundFile(fullPath)
+
+            if self.volume then
+                sound:setVolume(self.volume)
+            end
+
+            self.challengeSounds[key] = sound
         else
             utils.logError("WaveFileVoice", "The file '" .. fullPath .. "' does not exist")
         end
@@ -125,7 +157,13 @@ function waveFileVoice:activateResponseSounds()
         local fullPath = self.responseFilesDirectoryPath .. DIRECTORY_SEPARATOR .. soundFileName
 
         if utils.fileExists(fullPath) then
-            self.responseSounds[key] = audio.loadSoundFile(fullPath)
+            local sound = audio.loadSoundFile(fullPath)
+
+            if self.volume then
+                sound:setVolume(self.volume)
+            end
+
+            self.responseSounds[key] = sound
         else
             utils.logError("WaveFileVoice", "The file '" .. fullPath .. "' does not exist")
         end
@@ -135,7 +173,13 @@ function waveFileVoice:activateResponseSounds()
         local fullPath = self.responseFilesDirectoryPath .. DIRECTORY_SEPARATOR .. soundFileName
 
         if utils.fileExists(fullPath) then
-            table.insert(self.failSounds, audio.loadSoundFile(fullPath))
+            local sound = audio.loadSoundFile(fullPath)
+
+            if self.volume then
+                sound:setVolume(self.volume)
+            end
+
+            table.insert(self.failSounds, sound)
         else
             utils.logError("WaveFileVoice", "The file '" .. fullPath .. "' does not exist")
         end
