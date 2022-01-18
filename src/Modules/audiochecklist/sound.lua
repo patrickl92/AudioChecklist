@@ -28,7 +28,7 @@ function sound:new(soundTableEntry, duration)
     return obj
 end
 
---- Sets the volume of the sound
+--- Sets the volume of the sound.
 -- A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
 -- @tparam numer volume The volume to use.
 function sound:setVolume(volume)
