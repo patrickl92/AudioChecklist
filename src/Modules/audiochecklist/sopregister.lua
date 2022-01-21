@@ -16,6 +16,8 @@ local addedCallbacks = {}
 function sopRegister.addSOP(sop)
     utils.verifyNotNil("sop", sop)
 
+    utils.logInfo("SopExecutor", "Registered SOP '" .. sop:getName() .. "'")
+
     table.insert(standardOperatingProcecudes, sop)
 
     for _, callback in ipairs(addedCallbacks) do

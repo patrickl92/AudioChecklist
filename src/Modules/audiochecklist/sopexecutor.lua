@@ -97,7 +97,7 @@ function sopExecutor.setActiveSOP(sop)
     sopExecutor.stopChecklist()
 
     if activeSOP then
-        utils.logDebug("SopExecutor", "Deactivating SOP '" .. activeSOP:getName() .. "'")
+        utils.logInfo("SopExecutor", "Deactivating SOP '" .. activeSOP:getName() .. "'")
 
         challengeVoice:deactivateChallengeSounds()
         responseVoice:deactivateResponseSounds()
@@ -112,7 +112,7 @@ function sopExecutor.setActiveSOP(sop)
     activeSOP = sop
 
     if activeSOP then
-        utils.logDebug("SopExecutor", "Activating SOP '" .. activeSOP:getName() .. "'")
+        utils.logInfo("SopExecutor", "Activating SOP '" .. activeSOP:getName() .. "'")
 
         -- Reset the SOP to ensure a correct state
         activeSOP:reset()
@@ -130,8 +130,8 @@ function sopExecutor.setActiveSOP(sop)
             error("SOP does not have an active response voice set")
         end
 
-        utils.logDebug("SopExecutor", "Challenge voice: '" .. challengeVoice:getName() .. "'")
-        utils.logDebug("SopExecutor", "Response voice: '" .. responseVoice:getName() .. "'")
+        utils.logInfo("SopExecutor", "Challenge voice: '" .. challengeVoice:getName() .. "'")
+        utils.logInfo("SopExecutor", "Response voice: '" .. responseVoice:getName() .. "'")
 
         challengeVoice:setVolume(voiceVolume)
         responseVoice:setVolume(voiceVolume)
@@ -327,7 +327,7 @@ end
 -- This function does nothing if no checklist has been started.
 function sopExecutor.pause()
     if not paused and activeSOP and activeSOP:getActiveChecklist() then
-        utils.logDebug("SopExecutor", "Pausing checklist execution")
+        utils.logInfo("SopExecutor", "Pausing checklist execution")
 
         paused = true
         pauseStartTime = utils.getTime()
@@ -342,7 +342,7 @@ end
 -- This function does nothing if the execution is not paused.
 function sopExecutor.resume()
     if paused then
-        utils.logDebug("SopExecutor", "Resuming checklist execution")
+        utils.logInfo("SopExecutor", "Resuming checklist execution")
 
         paused = false
 
@@ -442,6 +442,7 @@ function sopExecutor.setVoiceVolume(volume)
     utils.verifyType("volume", volume, "number")
 	if volume <= 0 then error ("Volume must be greater than zero") end
 
+    utils.logDebug("SopExecutor", "Set volume: " .. tostring(volume))
     voiceVolume = volume
 
     if challengeVoice then
