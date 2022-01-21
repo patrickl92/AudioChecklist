@@ -1,0 +1,795 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><strong>sopExecutor</strong></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>sopExecutor</code></h1>
+<p>Contains the logic for executing a checklist.</p>
+<p>
+ A SOP needs to be set in order to execute a checklist. Any checklist of the active SOP can be started or stopped at any time.
+ The state of the active checklist and its checklist items is updated during execution. All the required sounds are played using the active voices of the SOP.
+ Execution of a checklist can be paused and resumed.
+<p> The update function needs to be called regularly to continue the execution of the current checklist.
+<p> Callbacks can be added to react to SOPs getting activated and deactivated, checklists being started, cancelled and completed and checklist items getting started, failed and completed.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#setActiveSOP">setActiveSOP (sop)</a></td>
+	<td class="summary">Sets the active standard operating procedure.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getActiveSOP">getActiveSOP ()</a></td>
+	<td class="summary">Gets the active standard operating procedure.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#startChecklist">startChecklist (checklist)</a></td>
+	<td class="summary">Starts the execution of a checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#stopChecklist">stopChecklist ()</a></td>
+	<td class="summary">Stops the execution of the active checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#doOften">doOften ()</a></td>
+	<td class="summary">Executes the <code>do_often</code> callback of the active SOP.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#doEveryFrame">doEveryFrame ()</a></td>
+	<td class="summary">Executes the <code>do_every_frame</code> callback of the active SOP.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#update">update ()</a></td>
+	<td class="summary">Executes the active SOP and its checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pause">pause ()</a></td>
+	<td class="summary">Pauses the execution of a checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#resume">resume ()</a></td>
+	<td class="summary">Resumes the execution of a checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#isPaused">isPaused ()</a></td>
+	<td class="summary">Checks whether execution of the checklist is currently paused.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setCurrentChecklistItemDone">setCurrentChecklistItemDone ()</a></td>
+	<td class="summary">Sets the current checklist item to manually done.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#enableAutoDone">enableAutoDone ()</a></td>
+	<td class="summary">Enables the automatic completion of manual checklist items.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#disableAutoDone">disableAutoDone ()</a></td>
+	<td class="summary">Disables the automatic completion of manual checklist items.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#autoDoneEnabled">autoDoneEnabled ()</a></td>
+	<td class="summary">Gets a value indicating whether the automatic completion of manual checklist items is currently enabled.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setResponseDelay">setResponseDelay (delay)</a></td>
+	<td class="summary">Sets the delay for playing the response sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getResponseDelay">getResponseDelay ()</a></td>
+	<td class="summary">Gets the delay for playing the response sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setNextChecklistItemDelay">setNextChecklistItemDelay (delay)</a></td>
+	<td class="summary">Sets the delay for the execution of the next checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getNextChecklistItemDelay">getNextChecklistItemDelay ()</a></td>
+	<td class="summary">Gets the delay for the execution of the next checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setVoiceVolume">setVoiceVolume (volume)</a></td>
+	<td class="summary">Sets the volume of the challenge and response voices.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#getVoiceVolume">getVoiceVolume ()</a></td>
+	<td class="summary">Gets the volume of the challenge and response voices.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addSOPActivatedCallback">addSOPActivatedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a SOP is activated.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addSOPDeactivatedCallback">addSOPDeactivatedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a SOP is deactivated.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addChecklistStartedCallback">addChecklistStartedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a checklist is started.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addChecklistCancelledCallback">addChecklistCancelledCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a checklist is cancelled.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addChecklistCompletedCallback">addChecklistCompletedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a checklist is completed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addChecklistItemStartedCallback">addChecklistItemStartedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a checklist item is started.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addChecklistItemFailedCallback">addChecklistItemFailedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a checklist item has failed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#addChecklistItemCompletedCallback">addChecklistItemCompletedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if a checklist item is completed.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "setActiveSOP"></a>
+    <strong>setActiveSOP (sop)</strong>
+    </dt>
+    <dd>
+    Sets the active standard operating procedure.
+ This deactivates the previously active standard operating procedure.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sop</span>
+            <span class="types">optional <a class="type" href="../classes/standardOperatingProcedure.html#">standardOperatingProcedure</a></span>
+         The standard operating procedure to activate. Can be <code>nil</code>.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the standard operating procedure has no active challenge voice or no active response voice set.
+
+
+
+</dd>
+    <dt>
+    <a name = "getActiveSOP"></a>
+    <strong>getActiveSOP ()</strong>
+    </dt>
+    <dd>
+    Gets the active standard operating procedure.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="../classes/standardOperatingProcedure.html#">standardOperatingProcedure</a></span>
+        The active standard operating procedure.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "startChecklist"></a>
+    <strong>startChecklist (checklist)</strong>
+    </dt>
+    <dd>
+    Starts the execution of a checklist.
+ The checklist must be part of the active SOP.
+ If there has already been a checklist started, then the previous execution is stopped.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">checklist</span>
+            <span class="types"><a class="type" href="../classes/checklist.html#">checklist</a></span>
+         The checklist to execute.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if there is no active SOP or the checklist does not belong to the active SOP.
+
+
+
+</dd>
+    <dt>
+    <a name = "stopChecklist"></a>
+    <strong>stopChecklist ()</strong>
+    </dt>
+    <dd>
+    Stops the execution of the active checklist.
+ It also resets the pause of the active checklist.
+ This function does nothing if no checklist has been started.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "doOften"></a>
+    <strong>doOften ()</strong>
+    </dt>
+    <dd>
+    Executes the <code>do_often</code> callback of the active SOP.
+ This function does nothing if no SOP has been activated.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "doEveryFrame"></a>
+    <strong>doEveryFrame ()</strong>
+    </dt>
+    <dd>
+    Executes the <code>do_every_frame</code> callback of the active SOP.
+ This function does nothing if no SOP has been activated.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "update"></a>
+    <strong>update ()</strong>
+    </dt>
+    <dd>
+    Executes the active SOP and its checklist.
+ This function needs to be called regularly in order to execute the checklist.
+ This function does nothing if no SOP has been activated, no checklist has been started or the execution is paused.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pause"></a>
+    <strong>pause ()</strong>
+    </dt>
+    <dd>
+    Pauses the execution of a checklist.
+ This function does nothing if no checklist has been started.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "resume"></a>
+    <strong>resume ()</strong>
+    </dt>
+    <dd>
+    Resumes the execution of a checklist.
+ This function does nothing if the execution is not paused.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "isPaused"></a>
+    <strong>isPaused ()</strong>
+    </dt>
+    <dd>
+    Checks whether execution of the checklist is currently paused.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the execution is paused, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setCurrentChecklistItemDone"></a>
+    <strong>setCurrentChecklistItemDone ()</strong>
+    </dt>
+    <dd>
+    Sets the current checklist item to manually done.
+ This function does nothing if there is no checklist item active.
+ It can be used to complete the manual checklist items or to skip failed automatic checklist items.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "enableAutoDone"></a>
+    <strong>enableAutoDone ()</strong>
+    </dt>
+    <dd>
+    Enables the automatic completion of manual checklist items.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "disableAutoDone"></a>
+    <strong>disableAutoDone ()</strong>
+    </dt>
+    <dd>
+    Disables the automatic completion of manual checklist items.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "autoDoneEnabled"></a>
+    <strong>autoDoneEnabled ()</strong>
+    </dt>
+    <dd>
+    Gets a value indicating whether the automatic completion of manual checklist items is currently enabled.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the automatic completion of manual checklist items is currently enabled, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setResponseDelay"></a>
+    <strong>setResponseDelay (delay)</strong>
+    </dt>
+    <dd>
+    Sets the delay for playing the response sound.
+ This also delays the evaluation of the checklist item.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">delay</span>
+            <span class="types"><span class="type">number</span></span>
+         The delay to use in seconds. Must be greater or equal to zero.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getResponseDelay"></a>
+    <strong>getResponseDelay ()</strong>
+    </dt>
+    <dd>
+    Gets the delay for playing the response sound.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The currently used delay.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setNextChecklistItemDelay"></a>
+    <strong>setNextChecklistItemDelay (delay)</strong>
+    </dt>
+    <dd>
+    Sets the delay for the execution of the next checklist item.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">delay</span>
+            <span class="types"><span class="type">number</span></span>
+         The delay to use in seconds. Must be greater or equal to zero.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getNextChecklistItemDelay"></a>
+    <strong>getNextChecklistItemDelay ()</strong>
+    </dt>
+    <dd>
+    Gets the delay for the execution of the next checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The currently used delay.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setVoiceVolume"></a>
+    <strong>setVoiceVolume (volume)</strong>
+    </dt>
+    <dd>
+    Sets the volume of the challenge and response voices.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">volume</span>
+            <span class="types"><span class="type">numer</span></span>
+         The volume to use.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "getVoiceVolume"></a>
+    <strong>getVoiceVolume ()</strong>
+    </dt>
+    <dd>
+    Gets the volume of the challenge and response voices.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The currently used volume.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "addSOPActivatedCallback"></a>
+    <strong>addSOPActivatedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a SOP is activated.
+ The activated SOP is passed as parameter to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addSOPActivatedCallback(<span class="keyword">function</span>(sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addSOPDeactivatedCallback"></a>
+    <strong>addSOPDeactivatedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a SOP is deactivated.
+ The SOP is passed as parameter to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addSOPDeactivatedCallback(<span class="keyword">function</span>(sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addChecklistStartedCallback"></a>
+    <strong>addChecklistStartedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a checklist is started.
+ The started checklist and the active SOP are passed as parameters to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addChecklistStartedCallback(<span class="keyword">function</span>(checklist, sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addChecklistCancelledCallback"></a>
+    <strong>addChecklistCancelledCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a checklist is cancelled.
+ The cancelled checklist and the active SOP are passed as parameters to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addChecklistCancelledCallback(<span class="keyword">function</span>(checklist, sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addChecklistCompletedCallback"></a>
+    <strong>addChecklistCompletedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a checklist is completed.
+ The completed checklist and the active SOP are passed as parameters to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addChecklistCompletedCallback(<span class="keyword">function</span>(checklist, sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addChecklistItemStartedCallback"></a>
+    <strong>addChecklistItemStartedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a checklist item is started.
+ The started checklist item, its checklist and the active SOP are passed as parameters to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addChecklistItemStartedCallback(<span class="keyword">function</span>(checklistItem, checklist, sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addChecklistItemFailedCallback"></a>
+    <strong>addChecklistItemFailedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a checklist item has failed.
+ The failed checklist item, its checklist and the active SOP are passed as parameters to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addChecklistItemFailedCallback(<span class="keyword">function</span>(checklistItem, checklist, sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "addChecklistItemCompletedCallback"></a>
+    <strong>addChecklistItemCompletedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if a checklist item is completed.
+ The completed checklist item, its checklist and the active SOP are passed as parameters to the callback.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">sopExecutor.addChecklistItemCompletedCallback(<span class="keyword">function</span>(checklistItem, checklist, sop) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-01-21 18:30:12 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
