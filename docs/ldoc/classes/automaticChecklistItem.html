@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><strong>automaticChecklistItem</strong></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>automaticChecklistItem</code></h1>
+<p>Implemention of a checklist item which evaluates whether its conditions are met.</p>
+<p>
+ It uses a callback for the evaluation so that it can be utilized for different cases. The checklist item is completed automatically if the conditions are met.</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../classes/checklistItem.html#">checklistItem</a>
+    </ul>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:new">automaticChecklistItem:new (challengeText, responseText, challengeKey, evaluateFunction)</a></td>
+	<td class="summary">Creates a checklist item, which will be completed automatically if the conditions are met.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:getChallengeText">automaticChecklistItem:getChallengeText ()</a></td>
+	<td class="summary">Gets the challenge text of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:getResponseText">automaticChecklistItem:getResponseText ()</a></td>
+	<td class="summary">Gets the response text of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:getChallengeKey">automaticChecklistItem:getChallengeKey ()</a></td>
+	<td class="summary">Gets the key of the challenge sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:getResponseKey">automaticChecklistItem:getResponseKey ()</a></td>
+	<td class="summary">Gets the key of the response sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:hasResponse">automaticChecklistItem:hasResponse ()</a></td>
+	<td class="summary">Checks whether the checklist item has a response.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#automaticChecklistItem:evaluate">automaticChecklistItem:evaluate ()</a></td>
+	<td class="summary">Checks whether the conditions of the checklist items are met.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "automaticChecklistItem:new"></a>
+    <strong>automaticChecklistItem:new (challengeText, responseText, challengeKey, evaluateFunction)</strong>
+    </dt>
+    <dd>
+    Creates a checklist item, which will be completed automatically if the conditions are met.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">challengeText</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The challenge text of the checklist item.
+        </li>
+        <li><span class="parameter">responseText</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The response text of the checklist item, which is also used as the key of the response sound.
+        </li>
+        <li><span class="parameter">challengeKey</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the challenge sound..
+        </li>
+        <li><span class="parameter">evaluateFunction</span>
+            <span class="types"><span class="type">func</span></span>
+         The function to evaluate whether the conditions for the checklist item are met. If the function returns any value other than <code>true</code>, the conditions are considered as not met.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/automaticChecklistItem.html#">automaticChecklistItem</a></span>
+        The created checklist item.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "automaticChecklistItem:getChallengeText"></a>
+    <strong>automaticChecklistItem:getChallengeText ()</strong>
+    </dt>
+    <dd>
+    Gets the challenge text of the checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The challenge text of the checklist item.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "automaticChecklistItem:getResponseText"></a>
+    <strong>automaticChecklistItem:getResponseText ()</strong>
+    </dt>
+    <dd>
+    Gets the response text of the checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The response text of the checklist item.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "automaticChecklistItem:getChallengeKey"></a>
+    <strong>automaticChecklistItem:getChallengeKey ()</strong>
+    </dt>
+    <dd>
+    Gets the key of the challenge sound.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The key of the challenge sound.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "automaticChecklistItem:getResponseKey"></a>
+    <strong>automaticChecklistItem:getResponseKey ()</strong>
+    </dt>
+    <dd>
+    Gets the key of the response sound.
+ The response text is used as the key of the response sound.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The response text of the response sound.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "automaticChecklistItem:hasResponse"></a>
+    <strong>automaticChecklistItem:hasResponse ()</strong>
+    </dt>
+    <dd>
+    Checks whether the checklist item has a response.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Always <code>true</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "automaticChecklistItem:evaluate"></a>
+    <strong>automaticChecklistItem:evaluate ()</strong>
+    </dt>
+    <dd>
+    Checks whether the conditions of the checklist items are met.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the evaluation callback returns <code>true</code>, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-01-21 18:55:39 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

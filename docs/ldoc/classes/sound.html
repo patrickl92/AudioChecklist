@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><strong>sound</strong></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>sound</code></h1>
+<p>Provides functions to play a loaded sound.</p>
+<p>
+ A sound can be started, paused and resumed. It also provides information if the sound has finished playing.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#sound:new">sound:new (soundTableEntry, duration)</a></td>
+	<td class="summary">Creates a new sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sound:setVolume">sound:setVolume (volume)</a></td>
+	<td class="summary">Sets the volume of the sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sound:play">sound:play ()</a></td>
+	<td class="summary">Plays or resumes the sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sound:pause">sound:pause ()</a></td>
+	<td class="summary">Pauses the sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sound:isFinished">sound:isFinished ()</a></td>
+	<td class="summary">Checks whether the sound has finished playing.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sound:getSoundTableEntry">sound:getSoundTableEntry ()</a></td>
+	<td class="summary">Gets the reference to the entry in the FlyWithLua sound table.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "sound:new"></a>
+    <strong>sound:new (soundTableEntry, duration)</strong>
+    </dt>
+    <dd>
+    Creates a new sound.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">soundTableEntry</span>
+            <span class="types"><span class="type">number</span></span>
+         The reference to the entry in the FlyWithLua sound table.
+        </li>
+        <li><span class="parameter">duration</span>
+            <span class="types"><span class="type">number</span></span>
+         The duration of the sound.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/sound.html#">sound</a></span>
+        The created sound.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sound:setVolume"></a>
+    <strong>sound:setVolume (volume)</strong>
+    </dt>
+    <dd>
+    Sets the volume of the sound.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">volume</span>
+            <span class="types"><span class="type">numer</span></span>
+         The volume to use.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sound:play"></a>
+    <strong>sound:play ()</strong>
+    </dt>
+    <dd>
+    Plays or resumes the sound.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sound:pause"></a>
+    <strong>sound:pause ()</strong>
+    </dt>
+    <dd>
+    Pauses the sound.
+ The sound is not paused if the sound has already been paused, has not been started or has finished playing.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sound:isFinished"></a>
+    <strong>sound:isFinished ()</strong>
+    </dt>
+    <dd>
+    Checks whether the sound has finished playing.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the sound has not bee started, is currently paused or has finished playing, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sound:getSoundTableEntry"></a>
+    <strong>sound:getSoundTableEntry ()</strong>
+    </dt>
+    <dd>
+    Gets the reference to the entry in the FlyWithLua sound table.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The reference to the sound table entry.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-01-21 18:55:39 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
