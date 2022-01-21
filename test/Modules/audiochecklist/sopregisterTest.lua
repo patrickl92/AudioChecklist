@@ -1,10 +1,14 @@
 insulate("SOPRegister", function()
     local sopRegister
+    local utils
     local standardOperatingProcedure
 
     setup(function()
         sopRegister = require "audiochecklist.sopregister"
+        utils = require "audiochecklist.utils"
         standardOperatingProcedure = require "audiochecklist.standardoperatingprocedure"
+
+        stub.new(utils, "logInfo")
     end)
 
     teardown(function()
@@ -32,11 +36,15 @@ end)
 
 insulate("SOPRegister", function()
     local sopRegister
+    local utils
     local standardOperatingProcedure
 
     setup(function()
         sopRegister = require "audiochecklist.sopregister"
+        utils = require "audiochecklist.utils"
         standardOperatingProcedure = require "audiochecklist.standardoperatingprocedure"
+
+        stub.new(utils, "logInfo")
     end)
 
     teardown(function()

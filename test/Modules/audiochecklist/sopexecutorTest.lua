@@ -141,6 +141,7 @@ describe("SOPExecutor",function()
         currentTime = 1
 
         stub.new(utils, "logDebug")
+        stub.new(utils, "logInfo")
         stub.new(utils, "getTime", function() return currentTime end)
     end)
 
