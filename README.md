@@ -22,6 +22,10 @@ The framework itself does not contain any checklists. The available checklists c
 
 If you want to create your own checklists, follow this [guide](docs/CreateSOP.md).
 
+This exension is available completely for free. If you want to support me, please consider a donation: [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=FQDNVDU5PGZ4G). Thank you.
+
+## Preview
+
 This is what it looks like with an installed checklist:
 
 https://user-images.githubusercontent.com/16118262/149665563-2b154640-8a14-407b-9eb7-a2d16d098e90.mp4
