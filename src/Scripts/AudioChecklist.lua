@@ -53,26 +53,26 @@ local lastRenderedChecklist = nil
 --- Updates the list of filtered SOPs based on the selected plane.
 local function updateFilteredSOPs()
 	filteredSOPs = {}
-	
+
 	if supportedPlanes[selectedPlaneIndex] then
 		local selectedPlane = supportedPlanes[selectedPlaneIndex]
 		local planeKey = preferences.escapeString(selectedPlane)
 		local lastUsedSopName = preferences.get("LastUsedSOP_" .. planeKey)
-				
+
 		for _, sop in ipairs(allSOPs) do
 			for _, plane in ipairs(sop:getAirplanes()) do
 				if plane == selectedPlane then
 					table.insert(filteredSOPs, sop)
-					
+
 					if lastUsedSopName == sop:getName() then
 						-- Select the last used SOP
 						selectedSOPIndex = #filteredSOPs
 					end
-					
+
 					local sopKey = preferences.escapeString(sop:getName())
 					local lastUsedChallengeVoiceName = preferences.get("LastUsedChallengeVoice_" .. planeKey .. "_" .. sopKey)
 					local lastUsedResponseVoiceName = preferences.get("LastUsedResponseVoice_" .. planeKey .. "_" .. sopKey)
-					
+
 					for _, voice in ipairs(sop:getChallengeVoices()) do
 						if lastUsedChallengeVoiceName == voice:getName() then
 							-- Activate the last used challenge voice
@@ -80,7 +80,7 @@ local function updateFilteredSOPs()
 							break
 						end
 					end
-					
+
 					for _, voice in ipairs(sop:getResponseVoices()) do
 						if lastUsedResponseVoiceName == voice:getName() then
 							-- Activate the last used response voice
@@ -88,7 +88,7 @@ local function updateFilteredSOPs()
 							break
 						end
 					end
-					
+
 					break
 				end
 			end
@@ -101,10 +101,10 @@ local function initialize()
 	allSOPs = sopRegister.getAllSOPs()
 	supportedPlanes = {}
 	local addedPlanes = {}
-	
+
 	table.insert(supportedPlanes, PLANE_ICAO)
 	addedPlanes[PLANE_ICAO] = true
-	
+
 	for _, sop in ipairs(allSOPs) do
 		for _, plane in ipairs(sop:getAirplanes()) do
 			if not addedPlanes[plane] then
@@ -113,17 +113,17 @@ local function initialize()
 			end
 		end
 	end
-	
+
 	table.sort(allSOPs, function (left, right) return left:getName() < right:getName() end)
 	table.sort(supportedPlanes)
-	
+
 	for i, plane in ipairs(supportedPlanes) do
 		if plane == PLANE_ICAO then
 			selectedPlaneIndex = i
 			break
 		end
 	end
-	
+
 	updateFilteredSOPs()
 end
 
@@ -132,47 +132,47 @@ end
 -- @tparam checklist checklist The checklist which contains the items to initialize.
 local function setChecklistItemsDisplayItems(checklist)
 	checklistItemsDisplayItems = {}
-	
+
 	if not checklist then
 		return
 	end
-	
-	-- Build the display text of the checklist (will look like '===== Title =====')	
+
+	-- Build the display text of the checklist (will look like '===== Title =====')
 	local checklistTitle = checklist:getTitle()
 	local checklistDisplayTextTable = {}
 	local requiredEqualSigns = lineLength - string.len(checklistTitle) - 2
-	
+
 	for i=0,math.floor((requiredEqualSigns / 2) + 0.5) - 1,1 do
 		checklistDisplayTextTable[#checklistDisplayTextTable + 1] = "="
 	end
-	
+
 	checklistDisplayTextTable[#checklistDisplayTextTable + 1] = " "
 	checklistDisplayTextTable[#checklistDisplayTextTable + 1] = checklistTitle
 	checklistDisplayTextTable[#checklistDisplayTextTable + 1] = " "
-	
+
 	for i=0,(requiredEqualSigns / 2) - 1,1 do
 		checklistDisplayTextTable[#checklistDisplayTextTable + 1] = "="
 	end
-	
+
 	activeChecklistDisplayText = table.concat(checklistDisplayTextTable)
-	
+
 	for _, checklistItem in ipairs(checklist:getAllItems()) do
 		if checklistItem:hasResponse() then
 			local challengeText = checklistItem:getChallengeText()
 			local responseText = checklistItem:getResponseText()
-		
-			-- Build the display text of the checklist item (will look like 'Challenge.......Response')	
+
+			-- Build the display text of the checklist item (will look like 'Challenge.......Response')
 			local displayTextTable = {}
 			local requiredDots = lineLength - string.len(challengeText) - string.len(responseText)
-			
+
 			displayTextTable[#displayTextTable + 1] = challengeText
-			
+
 			for i=0,requiredDots-1,1 do
 				displayTextTable[#displayTextTable + 1] = "."
 			end
-			
+
 			displayTextTable[#displayTextTable + 1] = responseText
-					
+
 			table.insert(checklistItemsDisplayItems, {
 				checklistItem = checklistItem,
 				displayText = table.concat(displayTextTable)
@@ -194,12 +194,12 @@ local function updateChecklistWindowSize()
 
 	local checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom = float_wnd_get_geometry(checklistWindow)
 	local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
-	
+
 	-- Used a fixed default with, because it does not work to calculate the current width if the window is popped out
 	local requiredWidth = 332
 	local requiredHeight = checklistWindowTop - checklistWindowBottom
 	local maxHeight = xPlaneWindowTop - xPlaneWindowBottom - 100
-	
+
 	-- Calculate the required height based on the content
 	local activeSOP = sopExecutor.getActiveSOP()
 	if activeSOP then
@@ -215,11 +215,11 @@ local function updateChecklistWindowSize()
 		-- SOP selection window
 		requiredHeight = 200
 	end
-			
+
 	if requiredHeight > maxHeight then
 		-- Limit the maximum height based on the size of the X-Plane window
 		requiredHeight = maxHeight
-		
+
 		if checklistWindowShowsScrollBar ~= true then
 			-- Extend the width for the scroll bar
 			requiredWidth = requiredWidth + 10
@@ -230,7 +230,7 @@ local function updateChecklistWindowSize()
 		requiredWidth = requiredWidth - 10
 		checklistWindowShowsScrollBar = false
 	end
-			
+
 	-- Update the size of the window and prevent resizing
 	float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowLeft + requiredWidth, checklistWindowTop - requiredHeight)
 	float_wnd_set_resizing_limits(checklistWindow, requiredWidth, requiredHeight, requiredWidth, requiredHeight)
@@ -244,43 +244,43 @@ local function renderSopMenu()
 	local selectedResponseVoiceName = ""
 	local selectedSOP = filteredSOPs[selectedSOPIndex]
 	local startButtonDisabled = false
-	
+
 	if supportedPlanes[selectedPlaneIndex] then
 		selectedPlane = supportedPlanes[selectedPlaneIndex]
 	end
-	
+
 	if selectedSOP then
 		selectedSOPName = selectedSOP:getName()
-		
+
 		local activeChallengeVoice = selectedSOP:getActiveChallengeVoice()
 		local activeRepsonseVoice = selectedSOP:getActiveResponseVoice()
-		
+
 		if activeChallengeVoice then
 			selectedChallengeVoiceName = activeChallengeVoice:getName()
 		end
-		
+
 		if activeRepsonseVoice then
 			selectedResponseVoiceName = activeRepsonseVoice:getName()
 		end
 	end
-	
+
 	if selectedResponseVoiceName == "" or selectedChallengeVoiceName == "" then
 		-- Do not allow starting a SOP if it has no active response or challenge voices set
 		startButtonDisabled = true
 	end
 
 	imgui.SetCursorPosY(15)
-	
+
 	-- ##################################
 	-- Plane selection
 	-- ##################################
-	
+
 	imgui.TextUnformatted("1. Select plane:")
 	imgui.SameLine()
 	imgui.SetCursorPosX(133)
 	imgui.SetCursorPosY(imgui.GetCursorPosY() - 3)
 	imgui.PushItemWidth(190)
-	
+
 	if imgui.BeginCombo("plane", selectedPlane) then
 		for i, plane in ipairs(supportedPlanes) do
 			if imgui.Selectable(plane, selectedPlaneIndex == i) then
@@ -289,17 +289,17 @@ local function renderSopMenu()
 				updateFilteredSOPs()
 			end
 		end
-		
+
 		imgui.EndCombo()
 	end
-	
+
 	imgui.PopItemWidth()
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
-	
+
 	-- ##################################
 	-- SOP selection
 	-- ##################################
-	
+
 	imgui.TextUnformatted("2. Select SOP:")
 	imgui.SameLine()
 	imgui.SetCursorPosX(133)
@@ -312,17 +312,17 @@ local function renderSopMenu()
 				selectedSOPIndex = i
 			end
 		end
-		
+
 		imgui.EndCombo()
 	end
-	
+
 	imgui.PopItemWidth()
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
-	
+
 	-- ##################################
 	-- Voice selection (Pilot flying)
 	-- ##################################
-	
+
 	imgui.TextUnformatted("3. Select pilots:")
 	imgui.SetCursorPosX(100)
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
@@ -331,7 +331,7 @@ local function renderSopMenu()
 	imgui.SetCursorPosX(133)
 	imgui.SetCursorPosY(imgui.GetCursorPosY() - 3)
 	imgui.PushItemWidth(190)
-	
+
 	if imgui.BeginCombo("pf", selectedResponseVoiceName) then
 		if selectedSOP then
 			for _, voice in ipairs(selectedSOP:getResponseVoices()) do
@@ -340,16 +340,16 @@ local function renderSopMenu()
 				end
 			end
 		end
-		
+
 		imgui.EndCombo()
 	end
-	
+
 	imgui.PopItemWidth()
-	
+
 	-- ##################################
 	-- Voice selection (Pilot monitoring)
 	-- ##################################
-	
+
 	imgui.SetCursorPosX(100)
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
 	imgui.TextUnformatted("PM:")
@@ -357,7 +357,7 @@ local function renderSopMenu()
 	imgui.SetCursorPosX(133)
 	imgui.SetCursorPosY(imgui.GetCursorPosY() - 3)
 	imgui.PushItemWidth(190)
-	
+
 	if imgui.BeginCombo("pm", selectedChallengeVoiceName) then
 		if selectedSOP then
 			for _, voice in ipairs(selectedSOP:getChallengeVoices()) do
@@ -366,39 +366,39 @@ local function renderSopMenu()
 				end
 			end
 		end
-		
+
 		imgui.EndCombo()
 	end
-	
+
 	imgui.PopItemWidth()
-	
+
 	-- ##################################
 	-- Start button
 	-- ##################################
-	
+
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
-	
+
 	if startButtonDisabled then
 		imgui.PushStyleColor(imgui.constant.Col.Button, buttonColorDefaultDisabled)
 		imgui.PushStyleColor(imgui.constant.Col.ButtonHovered, buttonColorDefaultDisabled)
 		imgui.PushStyleColor(imgui.constant.Col.ButtonActive, buttonColorDefaultDisabled)
 	end
-	
+
 	if imgui.Button("Start", 315, 25) then
 		if not startButtonDisabled then
 			-- Save the selected SOP and voices in the preferences
 			local planeKey = preferences.escapeString(selectedPlane)
 			local sopKey = preferences.escapeString(selectedSOP:getName())
-			
+
 			preferences.set("LastUsedSOP_" .. planeKey, selectedSOP:getName())
 			preferences.set("LastUsedChallengeVoice_" .. planeKey .. "_" .. sopKey, selectedChallengeVoiceName)
-			preferences.set("LastUsedResponseVoice_" .. planeKey .. "_" .. sopKey, selectedResponseVoiceName)			
-			
+			preferences.set("LastUsedResponseVoice_" .. planeKey .. "_" .. sopKey, selectedResponseVoiceName)
+
 			-- Start the selected SOP by setting it active in the SOP executor
 			sopExecutor.setActiveSOP(selectedSOP)
 		end
 	end
-	
+
 	if startButtonDisabled then
 		imgui.PopStyleColor(3)
 	end
@@ -408,13 +408,13 @@ end
 -- A button is displayed for each checklist. The content of the button is the title of the checklist. Clicking a button will start the execution of the checklist.
 local function renderChecklistMenu(sop)
 	imgui.SetCursorPosY(5)
-	
+
 	for _, checklist in ipairs(sop:getAllChecklists()) do
 		imgui.SetCursorPosX(10)
 		imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
-		
+
 		local popStyles = false
-		
+
 		if checklist:getState() == checklist.stateCompleted then
 			-- Checklist has already been completed, so change its color to green
 			imgui.PushStyleColor(imgui.constant.Col.Button, buttonColorGreen)
@@ -422,15 +422,15 @@ local function renderChecklistMenu(sop)
 			imgui.PushStyleColor(imgui.constant.Col.ButtonActive, buttonColorGreenActive)
 			popStyles = true
 		end
-		
+
 		if imgui.Button(checklist:getTitle(), 310, 25) then
 			-- Clicking the button starts the execution of the checklist
 			sopExecutor.startChecklist(checklist)
 		end
-		
+
 		if popStyles == true then
 			imgui.PopStyleColor(3)
-		end		
+		end
 	end
 end
 
@@ -439,20 +439,20 @@ end
 local function renderChecklist(checklist)
 	imgui.SetCursorPosX(10)
 	imgui.SetCursorPosY(10)
-	
+
 	-- ##################################
 	-- Top button bar
 	-- ##################################
-	
+
 	if imgui.Button("Back", 70, 25) then
 		-- Clicking the button stops the execution of the checklist
 		sopExecutor.stopChecklist()
 	end
-	
+
 	imgui.SameLine()
 	imgui.SetCursorPosX(130)
-	
-	local checklistPaused = sopExecutor.isPaused()	
+
+	local checklistPaused = sopExecutor.isPaused()
 	if checklistPaused then
 		-- The current checklist execution is paused, so show a button to resume the execution
 		if imgui.Button("Resume", 70, 25) then
@@ -464,19 +464,19 @@ local function renderChecklist(checklist)
 			sopExecutor.pause()
 		end
 	end
-	
+
 	local activeChecklistItem = checklist:getActiveItem()
 	if activeChecklistItem and activeChecklistItem:hasResponse() then
 		imgui.SameLine()
 		imgui.SetCursorPosX(250)
-		
+
 		if checklistPaused then
 			-- If the execution of the current checklist is paused, then render the "Done"/"Skip" button as disabled
 			imgui.PushStyleColor(imgui.constant.Col.Button, buttonColorDefaultDisabled)
 			imgui.PushStyleColor(imgui.constant.Col.ButtonHovered, buttonColorDefaultDisabled)
 			imgui.PushStyleColor(imgui.constant.Col.ButtonActive, buttonColorDefaultDisabled)
 		end
-		
+
 		if activeChecklistItem:isManualItem() then
 			-- The checklist item needs to be completed manually, so provide a button to complete it
 			if checklistPaused then
@@ -485,19 +485,19 @@ local function renderChecklist(checklist)
 				imgui.PushStyleColor(imgui.constant.Col.Button, buttonColorGreenDisabled)
 				imgui.PushStyleColor(imgui.constant.Col.ButtonHovered, buttonColorGreenDisabled)
 				imgui.PushStyleColor(imgui.constant.Col.ButtonActive, buttonColorGreenDisabled)
-			else				
+			else
 				imgui.PushStyleColor(imgui.constant.Col.Button, buttonColorGreen)
 				imgui.PushStyleColor(imgui.constant.Col.ButtonHovered, buttonColorGreenHovered)
 				imgui.PushStyleColor(imgui.constant.Col.ButtonActive, buttonColorGreenActive)
 			end
-			
+
 			if imgui.Button("Done", 70, 25) then
 				-- Ignore the button click if the execution of the current checklist is paused
 				if not checklistPaused then
 					sopExecutor.setCurrentChecklistItemDone()
 				end
 			end
-			
+
 			if checklistPaused == false then
 				imgui.PopStyleColor(3)
 			end
@@ -515,29 +515,29 @@ local function renderChecklist(checklist)
 			imgui.PopStyleColor(3)
 		end
 	end
-	
+
 	-- ##################################
 	-- Checklist title and items
 	-- ##################################
 
 	imgui.SetCursorPosX(10)
 	imgui.SetCursorPosY(50)
-	
+
 	-- Render the title of the checklist
 	imgui.PushStyleColor(imgui.constant.Col.Text, checklistStateColors[checklist:getState()])
 	imgui.TextUnformatted(activeChecklistDisplayText)
 	imgui.PopStyleColor()
-	
+
 	imgui.SetCursorPosY(65)
-	
+
 	for _, displayItem in ipairs(checklistItemsDisplayItems) do
 		-- Render each checklist item
 		imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
 		imgui.PushStyleColor(imgui.constant.Col.Text, itemStateColors[displayItem.checklistItem:getState()])
-		
+
 		imgui.TextUnformatted(displayItem.displayText)
-		
-		imgui.PopStyleColor()		
+
+		imgui.PopStyleColor()
 	end
 end
 
@@ -545,7 +545,7 @@ end
 function AudioChecklist_preferencesWindowOnRender()
 	imgui.SetCursorPosX(10)
 	imgui.SetCursorPosY(10)
-	
+
 	local autoDoneChanged, autoDoneValue = imgui.Checkbox("Enable Auto Done", sopExecutor.autoDoneEnabled())
 	if autoDoneChanged then
 		if autoDoneValue then
@@ -556,23 +556,23 @@ function AudioChecklist_preferencesWindowOnRender()
 			preferences.set("AutoDoneEnabled", "0")
 		end
 	end
-	
+
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
-	
+
 	local responseDelayChanged, responseDelayValue = imgui.SliderFloat("Response Delay", sopExecutor.getResponseDelay(), 0, 1, "%.1f seconds")
 	if responseDelayChanged then
 		sopExecutor.setResponseDelay(responseDelayValue)
 		preferences.set("ResponseDelay", tostring(responseDelayValue))
 	end
-	
+
 	local nextChecklistItemDelayChanged, nextChecklistItemDelayValue = imgui.SliderFloat("Next Item Delay", sopExecutor.getNextChecklistItemDelay(), 0, 1, "%.1f seconds")
 	if nextChecklistItemDelayChanged then
 		sopExecutor.setNextChecklistItemDelay(nextChecklistItemDelayValue)
 		preferences.set("NextItemDelay", tostring(nextChecklistItemDelayValue))
 	end
-	
+
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
-	
+
 	local volumeChanged, volumeValue = imgui.SliderFloat("Volume", sopExecutor.getVoiceVolume() * 100, 10, 100, "%10.0f %%")
 	if volumeChanged then
 		sopExecutor.setVoiceVolume(volumeValue / 100)
@@ -584,30 +584,30 @@ end
 function AudioChecklist_checklistWindowOnRender()
 	checklistWindowOpen = true
 	checklistWindowPoppedOut = float_wnd_is_popped(checklistWindow)
-	
+
 	local activeSOP = sopExecutor.getActiveSOP()
 	local activeChecklist = nil
 
 	if activeSOP then
 		activeChecklist = activeSOP:getActiveChecklist()
 	end
-	
+
 	if lastRenderedSOP ~= activeSOP then
 		lastRenderedSOP = activeSOP
 		invalidateChecklistWindowSize()
 	end
-	
+
 	if lastRenderedChecklist ~= activeChecklist then
 		lastRenderedChecklist = activeChecklist
 		invalidateChecklistWindowSize()
 		setChecklistItemsDisplayItems(activeChecklist)
 	end
-		
+
 	if checklistWindowSizeValid ~= true then
 		updateChecklistWindowSize()
 		checklistWindowSizeValid = true
 	end
-	
+
 	if activeSOP then
 		local activeChecklist = activeSOP:getActiveChecklist()
 		if activeChecklist then
@@ -630,25 +630,25 @@ function AudioChecklist_showPreferencesWindow()
 	if preferencesWindow == nil then
 		local windowWidth = 356
 		local windowHeight = 118
-		
+
 		-- Create the window
 		preferencesWindow = float_wnd_create(windowWidth, windowHeight, 1, true)
-		
+
 		-- Set the window title
 		float_wnd_set_title(preferencesWindow, "Audio Checklist - Preferences")
-		
+
 		-- Set the callback functions
 		float_wnd_set_onclose(preferencesWindow, "AudioChecklist_preferencesWindowOnClosed")
 		float_wnd_set_imgui_builder(preferencesWindow, "AudioChecklist_preferencesWindowOnRender")
-		
+
 		-- Prevent resizing
 		float_wnd_set_resizing_limits(preferencesWindow, windowWidth, windowHeight, windowWidth, windowHeight)
-		
+
 		-- Center window on screen
 		local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
 		local screenWidth = xPlaneWindowRight - xPlaneWindowLeft
 		local sceenHeight = xPlaneWindowTop - xPlaneWindowBottom
-		
+
 		float_wnd_set_geometry(preferencesWindow, xPlaneWindowLeft + (screenWidth - windowWidth) / 2, xPlaneWindowBottom + (sceenHeight - windowHeight) / 2, xPlaneWindowLeft + (screenWidth + windowWidth) / 2, xPlaneWindowBottom + (sceenHeight + windowHeight) / 2)
 	end
 end
@@ -683,31 +683,31 @@ function AudioChecklist_showChecklistWindow()
 	if checklistWindow == nil then
 		-- Create the window
 		checklistWindow = float_wnd_create(332, 110, 1, true)
-		
+
 		-- Set the window title
 		float_wnd_set_title(checklistWindow, "Audio Checklist")
-		
+
 		-- Set the callback functions
 		float_wnd_set_onclose(checklistWindow, "AudioChecklist_checklistWindowOnClosed")
 		float_wnd_set_imgui_builder(checklistWindow, "AudioChecklist_checklistWindowOnRender")
-		
+
 		if lastChecklistWindowPosition ~= nil then
 			local checklistWindowLeft = lastChecklistWindowPosition["Left"]
 			local checklistWindowTop = lastChecklistWindowPosition["Top"]
 			local checklistWindowRight = lastChecklistWindowPosition["Right"]
 			local checklistWindowBottom = lastChecklistWindowPosition["Bottom"]
-			
+
 			local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
-			
+
 			-- check whether the window is still inside the X-Plane window
 			if checklistWindowLeft >= xPlaneWindowLeft and checklistWindowLeft < (xPlaneWindowRight - 20) and checklistWindowTop <= xPlaneWindowTop and checklistWindowTop >= (xPlaneWindowBottom + 20) then
 				-- Restore the previous position of the window
 				float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
 			end
-		
+
 			lastChecklistWindowPosition = nil
 		end
-		
+
 		invalidateChecklistWindowSize()
 	end
 end
@@ -813,7 +813,7 @@ add_macro("Audio Checklist: Preferences", "AudioChecklist_showPreferencesWindow(
 
 -- Only for debugging
 --add_macro("Audio Checklist: Clear Preferences", "AudioChecklist_clearPreferences()")
---add_macro("Audio Checklist: Enable Debug Logging", "AudioChecklist_enableDebugLogging()", "AudioChecklist_disableDebugLogging()", "deactivate")
+add_macro("Audio Checklist: Enable Debug Logging", "AudioChecklist_enableDebugLogging()", "AudioChecklist_disableDebugLogging()", "deactivate")
 
 create_command("FlyWithLua/AudioChecklist/ToggleChecklistWindow", "Open/Close checklist window", "AudioChecklist_toggleChecklistWindow()", "", "")
 create_command("FlyWithLua/AudioChecklist/TogglePauseResume", "Pause/Resume checklist", "AudioChecklist_toggleChecklistPauseResume()", "", "")
