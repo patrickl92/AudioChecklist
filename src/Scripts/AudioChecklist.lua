@@ -192,6 +192,8 @@ local function updateChecklistWindowSize()
 		return
 	end
 
+    utils.logDebug("Main", "Updating checklist window size")
+
 	local checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom = float_wnd_get_geometry(checklistWindow)
 	local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
 
@@ -231,9 +233,16 @@ local function updateChecklistWindowSize()
 		checklistWindowShowsScrollBar = false
 	end
 
+    local left = checklistWindowLeft
+    local top = checklistWindowTop
+    local right = checklistWindowLeft + requiredWidth
+    local bottom = checklistWindowTop - requiredHeight
+
 	-- Update the size of the window and prevent resizing
-	float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowLeft + requiredWidth, checklistWindowTop - requiredHeight)
+	float_wnd_set_geometry(checklistWindow, left, top, right, bottom)
 	float_wnd_set_resizing_limits(checklistWindow, requiredWidth, requiredHeight, requiredWidth, requiredHeight)
+
+    utils.logDebug("Main", "Checklist window location: Left: " .. tostring(left) .. "; Top: " .. tostring(top) .. "; Right: " .. tostring(right) .. "; Bottom: " .. tostring(bottom))
 end
 
 --- Renders the menu for selecting a standard operating procedure.
@@ -622,12 +631,15 @@ end
 
 --- Callback function to reset the variables for the preferences window.
 function AudioChecklist_preferencesWindowOnClosed()
+    utils.logDebug("Main", "Preferences window closed")
 	preferencesWindow = nil
 end
 
 --- Shows the preferences window if it is not already visible.
 function AudioChecklist_showPreferencesWindow()
 	if preferencesWindow == nil then
+        utils.logDebug("Main", "Creating preferences window")
+
 		local windowWidth = 356
 		local windowHeight = 118
 
@@ -649,12 +661,21 @@ function AudioChecklist_showPreferencesWindow()
 		local screenWidth = xPlaneWindowRight - xPlaneWindowLeft
 		local sceenHeight = xPlaneWindowTop - xPlaneWindowBottom
 
-		float_wnd_set_geometry(preferencesWindow, xPlaneWindowLeft + (screenWidth - windowWidth) / 2, xPlaneWindowBottom + (sceenHeight - windowHeight) / 2, xPlaneWindowLeft + (screenWidth + windowWidth) / 2, xPlaneWindowBottom + (sceenHeight + windowHeight) / 2)
+        local left = xPlaneWindowLeft + (screenWidth - windowWidth) / 2
+        local top = xPlaneWindowBottom + (sceenHeight - windowHeight) / 2
+        local right = xPlaneWindowLeft + (screenWidth + windowWidth) / 2
+        local bottom = xPlaneWindowBottom + (sceenHeight + windowHeight) / 2
+
+		float_wnd_set_geometry(preferencesWindow, left, top, right, bottom)
+
+        utils.logDebug("Main", "Preferences window location: Left: " .. tostring(left) .. "; Top: " .. tostring(top) .. "; Right: " .. tostring(right) .. "; Bottom: " .. tostring(bottom))
 	end
 end
 
 --- Callback function to reset the variables for the checklist window.
 function AudioChecklist_checklistWindowOnClosed()
+    utils.logDebug("Main", "Checklist window closed")
+
 	if checklistWindowPoppedOut ~= true then
 		-- Store the current location of the window
 		local left, top, right, bottom = float_wnd_get_geometry(checklistWindow)
@@ -681,6 +702,8 @@ function AudioChecklist_showChecklistWindow()
 	end
 
 	if checklistWindow == nil then
+        utils.logDebug("Main", "Creating checklist window")
+
 		-- Create the window
 		checklistWindow = float_wnd_create(332, 110, 1, true)
 
@@ -707,6 +730,9 @@ function AudioChecklist_showChecklistWindow()
 
 			lastChecklistWindowPosition = nil
 		end
+
+        local left, top, right, bottom = float_wnd_get_geometry(checklistWindow)
+        utils.logDebug("Main", "Checklist window location: Left: " .. tostring(left) .. "; Top: " .. tostring(top) .. "; Right: " .. tostring(right) .. "; Bottom: " .. tostring(bottom))
 
 		invalidateChecklistWindowSize()
 	end
