@@ -704,8 +704,11 @@ function AudioChecklist_showChecklistWindow()
 	if checklistWindow == nil then
         utils.logDebug("Main", "Creating checklist window")
 
+		local windowWidth = 332
+		local windowHeight = 110
+
 		-- Create the window
-		checklistWindow = float_wnd_create(332, 110, 1, true)
+		checklistWindow = float_wnd_create(windowWidth, windowHeight, 1, true)
 
 		-- Set the window title
 		float_wnd_set_title(checklistWindow, "Audio Checklist")
@@ -720,15 +723,19 @@ function AudioChecklist_showChecklistWindow()
 			local checklistWindowRight = lastChecklistWindowPosition["Right"]
 			local checklistWindowBottom = lastChecklistWindowPosition["Bottom"]
 
-			local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
+			float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
+			lastChecklistWindowPosition = nil
+		else
+			local monitors = XPLMGetAllMonitorBoundsGlobal()
+			if #monitors > 0 then
+				local mainMonitor = monitors[1]
+				local checklistWindowLeft = mainMonitor.inLeft + 100
+				local checklistWindowTop = mainMonitor.inTop - 100
+				local checklistWindowRight = checklistWindowLeft + windowWidth
+				local checklistWindowBottom = checklistWindowTop - windowHeight
 
-			-- check whether the window is still inside the X-Plane window
-			if checklistWindowLeft >= xPlaneWindowLeft and checklistWindowLeft < (xPlaneWindowRight - 20) and checklistWindowTop <= xPlaneWindowTop and checklistWindowTop >= (xPlaneWindowBottom + 20) then
-				-- Restore the previous position of the window
 				float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
 			end
-
-			lastChecklistWindowPosition = nil
 		end
 
         local left, top, right, bottom = float_wnd_get_geometry(checklistWindow)
