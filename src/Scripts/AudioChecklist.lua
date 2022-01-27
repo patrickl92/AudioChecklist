@@ -657,14 +657,30 @@ function AudioChecklist_showPreferencesWindow()
 		float_wnd_set_resizing_limits(preferencesWindow, windowWidth, windowHeight, windowWidth, windowHeight)
 
 		-- Center window on screen
-		local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
-		local screenWidth = xPlaneWindowRight - xPlaneWindowLeft
-		local sceenHeight = xPlaneWindowTop - xPlaneWindowBottom
+		local screenLeft
+		local screenTop
+		local screenRight
+		local screenBottom
 
-        local left = xPlaneWindowLeft + (screenWidth - windowWidth) / 2
-        local top = xPlaneWindowBottom + (sceenHeight - windowHeight) / 2
-        local right = xPlaneWindowLeft + (screenWidth + windowWidth) / 2
-        local bottom = xPlaneWindowBottom + (sceenHeight + windowHeight) / 2
+		local monitors = XPLMGetAllMonitorBoundsGlobal()
+		if #monitors > 0 then
+			local mainMonitor = monitors[1]
+			screenLeft = mainMonitor.inLeft
+			screenTop = mainMonitor.inTop
+			screenRight = mainMonitor.inRight
+			screenBottom = mainMonitor.inBottom
+		else
+			-- X-Plane is in window mode
+			screenLeft, screenTop, screenRight, screenBottom = XPLMGetScreenBoundsGlobal()
+		end
+
+		local screenWidth = screenRight - screenLeft
+		local sceenHeight = screenTop - screenBottom
+
+		local left = screenLeft + (screenWidth - windowWidth) / 2
+		local top = screenBottom + (sceenHeight + windowHeight) / 2
+		local right = screenLeft + (screenWidth + windowWidth) / 2
+		local bottom = screenBottom + (sceenHeight - windowHeight) / 2
 
 		float_wnd_set_geometry(preferencesWindow, left, top, right, bottom)
 
