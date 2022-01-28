@@ -26,6 +26,12 @@ local buttonColorGreenActive = 0xFF079600
 local buttonColorDefaultDisabled = 0x806F4624
 local buttonColorGreenDisabled = 0x80267F00
 
+-- Define the variables used for handling different monitors
+local preferredMonitorIndex = 1
+local drawMonitorNumbers = false
+local monitorWindows = {}
+local monitorWindowsShown = false
+
 -- Define the variables used for displaying the preferences window
 local preferencesWindow = nil
 
@@ -179,6 +185,37 @@ local function setChecklistItemsDisplayItems(checklist)
 			})
 		end
 	end
+end
+
+--- Generates a display text for a monitor.
+-- @param monitor The monitor.
+-- @tparam number index The index of the monitor.
+-- @treturn string The generated display text.
+function getMonitorDisplayText(monitor, index)
+    return tostring(index) .. ": " .. tostring(monitor.inRight - monitor.inLeft) .. "x" .. tostring(monitor.inTop - monitor.inBottom)
+end
+
+--- Gets the bounds of the preferred monitor.
+-- If the preferred monitor does not exist, then the bounds of the first monitor are returned.
+-- If X-Plane is not fullscreen, then the bounds of the X-Plane window are returned.
+-- @return The bounds of the monitor.
+function getPreferredMonitorBounds()
+    local monitors = XPLMGetAllMonitorBoundsGlobal()
+
+    if #monitors == 0 then
+        -- X-Plane is not fullscreen
+        return XPLMGetScreenBoundsGlobal()
+    end
+
+    local monitorIndex = preferredMonitorIndex
+
+    if #monitors < monitorIndex then
+        -- Preferred monitor does no longer exist
+        monitorIndex = 1
+    end
+
+    local monitor = monitors[monitorIndex]
+    return monitor.inLeft, monitor.inTop, monitor.inRight, monitor.inBottom
 end
 
 --- Triggers a resize of the checklist window.
@@ -552,9 +589,12 @@ end
 
 --- Callback function to render the content of the preferences window.
 function AudioChecklist_preferencesWindowOnRender()
-	imgui.SetCursorPosX(10)
+	imgui.SetCursorPosX(8)
 	imgui.SetCursorPosY(10)
 
+	-- ##################################
+	-- Auto Done checkbox
+	-- ##################################
 	local autoDoneChanged, autoDoneValue = imgui.Checkbox("Enable Auto Done", sopExecutor.autoDoneEnabled())
 	if autoDoneChanged then
 		if autoDoneValue then
@@ -566,7 +606,12 @@ function AudioChecklist_preferencesWindowOnRender()
 		end
 	end
 
+	-- ##################################
+	-- Response Delay slider
+	-- ##################################
+
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
+    imgui.PushItemWidth(200)
 
 	local responseDelayChanged, responseDelayValue = imgui.SliderFloat("Response Delay", sopExecutor.getResponseDelay(), 0, 1, "%.1f seconds")
 	if responseDelayChanged then
@@ -574,11 +619,19 @@ function AudioChecklist_preferencesWindowOnRender()
 		preferences.set("ResponseDelay", tostring(responseDelayValue))
 	end
 
+	-- ##################################
+	-- Next Item Delay slider
+	-- ##################################
+
 	local nextChecklistItemDelayChanged, nextChecklistItemDelayValue = imgui.SliderFloat("Next Item Delay", sopExecutor.getNextChecklistItemDelay(), 0, 1, "%.1f seconds")
 	if nextChecklistItemDelayChanged then
 		sopExecutor.setNextChecklistItemDelay(nextChecklistItemDelayValue)
 		preferences.set("NextItemDelay", tostring(nextChecklistItemDelayValue))
 	end
+
+	-- ##################################
+	-- Volume slider
+	-- ##################################
 
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
 
@@ -587,6 +640,41 @@ function AudioChecklist_preferencesWindowOnRender()
 		sopExecutor.setVoiceVolume(volumeValue / 100)
 		preferences.set("VoiceVolume", tostring(volumeValue / 100))
 	end
+
+	-- ##################################
+	-- Preferred monitor combobox
+	-- ##################################
+
+    imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
+
+    local selectedMonitorText = ""
+    local monitors = XPLMGetAllMonitorBoundsGlobal()
+
+    if #monitors < preferredMonitorIndex then
+        -- Preferred monitor does no longer exist
+        preferredMonitorIndex = 1
+    end
+
+    if #monitors >= preferredMonitorIndex then
+        selectedMonitorText = getMonitorDisplayText(monitors[preferredMonitorIndex], preferredMonitorIndex)
+    end
+
+    if imgui.BeginCombo("Preferred Monitor", selectedMonitorText) then
+        drawMonitorNumbers = true
+
+        for index, monitor in ipairs(monitors) do
+            if imgui.Selectable(getMonitorDisplayText(monitor, index), preferredMonitorIndex == index) then
+                preferredMonitorIndex = index
+		        preferences.set("PreferredMonitorNumber", tostring(preferredMonitorIndex))
+            end
+        end
+
+        imgui.EndCombo()
+    else
+        drawMonitorNumbers = false
+    end
+
+	imgui.PopItemWidth()
 end
 
 --- Callback function to render the content of the checklist window.
@@ -629,6 +717,23 @@ function AudioChecklist_checklistWindowOnRender()
 	end
 end
 
+--- Callback function to render the content of a monitor window.
+function AudioChecklist_monitorWindowOnRender(monitorWindow)
+    local monitorNumber = 0
+
+    for index, window in ipairs(monitorWindows) do
+        if window == monitorWindow then
+            monitorNumber = index
+            break
+        end
+    end
+
+    imgui.SetCursorPosX(28)
+    imgui.SetCursorPosY(17)
+    imgui.SetWindowFontScale(2)
+    imgui.TextUnformatted("Monitor " .. tostring(monitorNumber))
+end
+
 --- Callback function to reset the variables for the preferences window.
 function AudioChecklist_preferencesWindowOnClosed()
     utils.logDebug("Main", "Preferences window closed")
@@ -640,8 +745,8 @@ function AudioChecklist_showPreferencesWindow()
 	if preferencesWindow == nil then
         utils.logDebug("Main", "Creating preferences window")
 
-		local windowWidth = 356
-		local windowHeight = 118
+		local windowWidth = 338
+		local windowHeight = 146
 
 		-- Create the window
 		preferencesWindow = float_wnd_create(windowWidth, windowHeight, 1, true)
@@ -657,30 +762,14 @@ function AudioChecklist_showPreferencesWindow()
 		float_wnd_set_resizing_limits(preferencesWindow, windowWidth, windowHeight, windowWidth, windowHeight)
 
 		-- Center window on screen
-		local screenLeft
-		local screenTop
-		local screenRight
-		local screenBottom
+        local monitorLeft, monitorTop, monitorRight, monitorBottom = getPreferredMonitorBounds()
+		local monitorWidth = monitorRight - monitorLeft
+		local monitorHeight = monitorTop - monitorBottom
 
-		local monitors = XPLMGetAllMonitorBoundsGlobal()
-		if #monitors > 0 then
-			local mainMonitor = monitors[1]
-			screenLeft = mainMonitor.inLeft
-			screenTop = mainMonitor.inTop
-			screenRight = mainMonitor.inRight
-			screenBottom = mainMonitor.inBottom
-		else
-			-- X-Plane is in window mode
-			screenLeft, screenTop, screenRight, screenBottom = XPLMGetScreenBoundsGlobal()
-		end
-
-		local screenWidth = screenRight - screenLeft
-		local sceenHeight = screenTop - screenBottom
-
-		local left = screenLeft + (screenWidth - windowWidth) / 2
-		local top = screenBottom + (sceenHeight + windowHeight) / 2
-		local right = screenLeft + (screenWidth + windowWidth) / 2
-		local bottom = screenBottom + (sceenHeight - windowHeight) / 2
+        local left = monitorLeft + (monitorWidth - windowWidth) / 2
+        local top = monitorBottom + (monitorHeight + windowHeight) / 2
+        local right = monitorLeft + (monitorWidth + windowWidth) / 2
+        local bottom = monitorBottom + (monitorHeight - windowHeight) / 2
 
 		float_wnd_set_geometry(preferencesWindow, left, top, right, bottom)
 
@@ -742,16 +831,13 @@ function AudioChecklist_showChecklistWindow()
 			float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
 			lastChecklistWindowPosition = nil
 		else
-			local monitors = XPLMGetAllMonitorBoundsGlobal()
-			if #monitors > 0 then
-				local mainMonitor = monitors[1]
-				local checklistWindowLeft = mainMonitor.inLeft + 100
-				local checklistWindowTop = mainMonitor.inTop - 100
-				local checklistWindowRight = checklistWindowLeft + windowWidth
-				local checklistWindowBottom = checklistWindowTop - windowHeight
+			local monitorLeft, monitorTop, monitorRight, monitorBottom = getPreferredMonitorBounds()
+            local checklistWindowLeft = monitorLeft + 100
+            local checklistWindowTop = monitorTop - 100
+            local checklistWindowRight = checklistWindowLeft + windowWidth
+            local checklistWindowBottom = checklistWindowTop - windowHeight
 
-				float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
-			end
+            float_wnd_set_geometry(checklistWindow, checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom)
 		end
 
         local left, top, right, bottom = float_wnd_get_geometry(checklistWindow)
@@ -783,8 +869,43 @@ function AudioChecklist_doOften()
 end
 
 --- Calls the doEveryFrame function of the SOP executor.
+-- Also shows the monitor numbers when required.
 function AudioChecklist_doEveryFrame()
 	sopExecutor.doEveryFrame()
+
+    if drawMonitorNumbers then
+        if not monitorWindowsShown then
+            local windowWidth = 180
+            local windowHeight = 60
+
+            for index, monitor in ipairs(XPLMGetAllMonitorBoundsGlobal()) do
+                local monitorWidth = monitor.inRight - monitor.inLeft
+                local left = monitor.inLeft + (monitorWidth - windowWidth) / 2
+                local top = monitor.inTop - 100
+                local right = left + windowWidth
+                local bottom = top - windowHeight
+
+                local window = float_wnd_create(windowWidth, windowHeight, 0, true)
+                float_wnd_set_geometry(window, left, top, right, bottom)
+                float_wnd_set_imgui_builder(window, "AudioChecklist_monitorWindowOnRender")
+
+                table.insert(monitorWindows, window)
+            end
+
+            monitorWindowsShown = true
+
+            if preferencesWindow then
+                float_wnd_bring_to_front(preferencesWindow)
+            end
+        end
+    elseif monitorWindowsShown then
+        for _, window in ipairs(monitorWindows) do
+            float_wnd_destroy(window)
+        end
+
+        monitorWindows = {}
+        monitorWindowsShown = false
+    end
 end
 
 --- Executes the active checklist.
@@ -849,6 +970,9 @@ do_every_frame("AudioChecklist_doEveryFrame()")
 if preferences.get("AutoDoneEnabled", "0") == "1" then
 	sopExecutor.enableAutoDone()
 end
+
+-- Get the preferred monitor
+preferredMonitorIndex = tonumber(preferences.get("PreferredMonitorNumber", "1"))
 
 -- Set the configured delays
 sopExecutor.setResponseDelay(tonumber(preferences.get("ResponseDelay", "0.3")))
