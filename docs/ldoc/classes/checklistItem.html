@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><strong>checklistItem</strong></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>checklistItem</code></h1>
+<p>Acts as an interface for a checklist item implementation.</p>
+<p>
+ A checklist item can have a challenge and resposne text, which are displayed in the UI. These are optional, however if the checklist item has a response, the challenge and response texts are required.
+<p> The challenge and response sounds are referenced by a key. The challenge sound key is required for each checklist item. The response sound key is only required if the checklist item provides a response text.
+<p> If a checklist item does not have a response, it is not displayed in the UI. Instead, only the challenge sound is played and then it is completed automatically.
+<p> A checklist item can either evaluate itself if its conditions are met or it can indicate that it needs to be completed manually (e.g. by the user or by some external trigger).
+<p> Callbacks can be added to react to the checklist item getting started, failed and completed.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:new">checklistItem:new ()</a></td>
+	<td class="summary">Creates a new checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:getChallengeText">checklistItem:getChallengeText ()</a></td>
+	<td class="summary">Gets the challenge text of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:getResponseText">checklistItem:getResponseText ()</a></td>
+	<td class="summary">Gets the response text of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:getChallengeKey">checklistItem:getChallengeKey ()</a></td>
+	<td class="summary">Gets the key of the challenge sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:getResponseKey">checklistItem:getResponseKey ()</a></td>
+	<td class="summary">Gets the key of the response sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:hasResponse">checklistItem:hasResponse ()</a></td>
+	<td class="summary">Checks whether the checklist item has a response
+ This function can be implemented in a derived checklist item class.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:isManualItem">checklistItem:isManualItem ()</a></td>
+	<td class="summary">Checks whether the checklist item needs to be completed manually.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:evaluate">checklistItem:evaluate ()</a></td>
+	<td class="summary">Checks whether the conditions of the checklist items are met.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:setState">checklistItem:setState (state)</a></td>
+	<td class="summary">Sets the state of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:getState">checklistItem:getState ()</a></td>
+	<td class="summary">Gets the current state of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:reset">checklistItem:reset ()</a></td>
+	<td class="summary">Resets the state of the checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:addStartedCallback">checklistItem:addStartedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if the checklist item is started.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:addFailedCallback">checklistItem:addFailedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if the checklist item has failed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:addCompletedCallback">checklistItem:addCompletedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if the checklist item is completed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:onStarted">checklistItem:onStarted ()</a></td>
+	<td class="summary">Executes the started callbacks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:onFailed">checklistItem:onFailed ()</a></td>
+	<td class="summary">Executes the failed callbacks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklistItem:onCompleted">checklistItem:onCompleted ()</a></td>
+	<td class="summary">Executes the completed callbacks.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "checklistItem:new"></a>
+    <strong>checklistItem:new ()</strong>
+    </dt>
+    <dd>
+    Creates a new checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/checklistItem.html#">checklistItem</a></span>
+        The created checklist item.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:getChallengeText"></a>
+    <strong>checklistItem:getChallengeText ()</strong>
+    </dt>
+    <dd>
+    Gets the challenge text of the checklist item.
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Always <code>nil</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:getResponseText"></a>
+    <strong>checklistItem:getResponseText ()</strong>
+    </dt>
+    <dd>
+    Gets the response text of the checklist item.
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Always <code>nil</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:getChallengeKey"></a>
+    <strong>checklistItem:getChallengeKey ()</strong>
+    </dt>
+    <dd>
+    Gets the key of the challenge sound.
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Always <code>nil</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:getResponseKey"></a>
+    <strong>checklistItem:getResponseKey ()</strong>
+    </dt>
+    <dd>
+    Gets the key of the response sound.
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        Always <code>nil</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:hasResponse"></a>
+    <strong>checklistItem:hasResponse ()</strong>
+    </dt>
+    <dd>
+    Checks whether the checklist item has a response
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Always <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:isManualItem"></a>
+    <strong>checklistItem:isManualItem ()</strong>
+    </dt>
+    <dd>
+    Checks whether the checklist item needs to be completed manually.
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Always <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:evaluate"></a>
+    <strong>checklistItem:evaluate ()</strong>
+    </dt>
+    <dd>
+    Checks whether the conditions of the checklist items are met.
+ This function can be implemented in a derived checklist item class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Always <code>true</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:setState"></a>
+    <strong>checklistItem:setState (state)</strong>
+    </dt>
+    <dd>
+    Sets the state of the checklist item.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">state</span>
+            <span class="types"><span class="type">number</span></span>
+         The new state.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:getState"></a>
+    <strong>checklistItem:getState ()</strong>
+    </dt>
+    <dd>
+    Gets the current state of the checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The current state.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:reset"></a>
+    <strong>checklistItem:reset ()</strong>
+    </dt>
+    <dd>
+    Resets the state of the checklist item.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:addStartedCallback"></a>
+    <strong>checklistItem:addStartedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if the checklist item is started.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myChecklistItem:addStartedCallback(<span class="keyword">function</span>() <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "checklistItem:addFailedCallback"></a>
+    <strong>checklistItem:addFailedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if the checklist item has failed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myChecklistItem:addFailedCallback(<span class="keyword">function</span>() <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "checklistItem:addCompletedCallback"></a>
+    <strong>checklistItem:addCompletedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if the checklist item is completed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myChecklistItem:addCompletedCallback(<span class="keyword">function</span>() <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "checklistItem:onStarted"></a>
+    <strong>checklistItem:onStarted ()</strong>
+    </dt>
+    <dd>
+    Executes the started callbacks.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:onFailed"></a>
+    <strong>checklistItem:onFailed ()</strong>
+    </dt>
+    <dd>
+    Executes the failed callbacks.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklistItem:onCompleted"></a>
+    <strong>checklistItem:onCompleted ()</strong>
+    </dt>
+    <dd>
+    Executes the completed callbacks.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-01-29 21:03:40 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
