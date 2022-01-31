@@ -182,6 +182,29 @@ describe("SOPExecutor",function()
         sopExecutor.setActiveSOP(nil)
     end)
 
+    it("should return the current execution mode", function()
+        assert.are.equal(sopExecutor.executionModeDefault, sopExecutor.getExecutionMode())
+
+        sopExecutor.setExecutionMode(sopExecutor.executionModeAutoDone)
+
+        assert.are.equal(sopExecutor.executionModeAutoDone, sopExecutor.getExecutionMode())
+
+        sopExecutor.setExecutionMode(sopExecutor.executionModeManual)
+
+        assert.are.equal(sopExecutor.executionModeManual, sopExecutor.getExecutionMode())
+
+        sopExecutor.setExecutionMode(sopExecutor.executionModeDefault)
+
+        assert.are.equal(sopExecutor.executionModeDefault, sopExecutor.getExecutionMode())
+    end)
+
+    it("should throw an error if an invalid execution mode is set", function()
+        assert.has_error(function() sopExecutor.setExecutionMode(nil) end, "mode must be a number")
+        assert.has_error(function() sopExecutor.setExecutionMode("0") end, "mode must be a number")
+        assert.has_error(function() sopExecutor.setExecutionMode(-1) end, "Invalid execution mode: -1")
+        assert.has_error(function() sopExecutor.setExecutionMode(3) end, "Invalid execution mode: 3")
+    end)
+
     it("should activate and deactivate the SOP", function()
         local sop = createSOP()
 
@@ -982,7 +1005,7 @@ describe("SOPExecutor",function()
         checklist:addItem(checklistItem)
         sop:addChecklist(checklist)
 
-        sopExecutor.enableAutoDone()
+        sopExecutor.setExecutionMode(sopExecutor.executionModeAutoDone)
         sopExecutor.setActiveSOP(sop)
         sopExecutor.startChecklist(checklist)
 
@@ -1023,8 +1046,8 @@ describe("SOPExecutor",function()
         checklist:addItem(checklistItem)
         sop:addChecklist(checklist)
 
-        sopExecutor.enableAutoDone()
-        sopExecutor.disableAutoDone()
+        sopExecutor.setExecutionMode(sopExecutor.executionModeAutoDone)
+        sopExecutor.setExecutionMode(sopExecutor.executionModeDefault)
         sopExecutor.setActiveSOP(sop)
         sopExecutor.startChecklist(checklist)
 
@@ -1553,18 +1576,6 @@ describe("SOPExecutor",function()
 
     it("should not throw an error if the execution is resumed but it was not paused", function()
         sopExecutor.resume()
-    end)
-
-    it("should report the state of the Auto Done option", function()
-        assert.is_false(sopExecutor.autoDoneEnabled())
-
-        sopExecutor.enableAutoDone()
-
-        assert.is_true(sopExecutor.autoDoneEnabled())
-
-        sopExecutor.disableAutoDone()
-
-        assert.is_false(sopExecutor.autoDoneEnabled())
     end)
 
     it("should report the current response delay", function()

@@ -26,6 +26,13 @@ local buttonColorGreenActive = 0xFF079600
 local buttonColorDefaultDisabled = 0x806F4624
 local buttonColorGreenDisabled = 0x80267F00
 
+-- Define the texts for the execution modes
+local executionModes = { sopExecutor.executionModeDefault, sopExecutor.executionModeAutoDone, sopExecutor.executionModeManual }
+local executionModeTexts = {}
+executionModeTexts[sopExecutor.executionModeDefault] = "Default"
+executionModeTexts[sopExecutor.executionModeAutoDone] = "Auto Done"
+executionModeTexts[sopExecutor.executionModeManual] = "Manual"
+
 -- Define the variables used for handling different monitors
 local preferredMonitorIndex = 1
 local drawMonitorNumbers = false
@@ -523,7 +530,7 @@ local function renderChecklist(checklist)
 			imgui.PushStyleColor(imgui.constant.Col.ButtonActive, buttonColorDefaultDisabled)
 		end
 
-		if activeChecklistItem:isManualItem() then
+		if activeChecklistItem:isManualItem() or sopExecutor.getExecutionMode() == sopExecutor.executionModeManual then
 			-- The checklist item needs to be completed manually, so provide a button to complete it
 			if checklistPaused then
 				-- Use the green disabled color for the "Done" button
@@ -591,27 +598,28 @@ end
 function AudioChecklist_preferencesWindowOnRender()
 	imgui.SetCursorPosX(8)
 	imgui.SetCursorPosY(10)
+    imgui.PushItemWidth(200)
 
 	-- ##################################
-	-- Auto Done checkbox
+	-- Execution Mode combobox
 	-- ##################################
-	local autoDoneChanged, autoDoneValue = imgui.Checkbox("Enable Auto Done", sopExecutor.autoDoneEnabled())
-	if autoDoneChanged then
-		if autoDoneValue then
-			sopExecutor.enableAutoDone()
-			preferences.set("AutoDoneEnabled", "1")
-		else
-			sopExecutor.disableAutoDone()
-			preferences.set("AutoDoneEnabled", "0")
-		end
-	end
+
+	if imgui.BeginCombo("Execution Mode", executionModeTexts[sopExecutor.getExecutionMode()]) then
+        for _, mode in ipairs(executionModes) do
+            if imgui.Selectable(executionModeTexts[mode], sopExecutor.getExecutionMode() == mode) then
+                sopExecutor.setExecutionMode(mode)
+		        preferences.set("ExecutionMode", tostring(mode))
+            end
+        end
+
+        imgui.EndCombo()
+    end
 
 	-- ##################################
 	-- Response Delay slider
 	-- ##################################
 
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 5)
-    imgui.PushItemWidth(200)
 
 	local responseDelayChanged, responseDelayValue = imgui.SliderFloat("Response Delay", sopExecutor.getResponseDelay(), 0, 1, "%.1f seconds")
 	if responseDelayChanged then
@@ -966,15 +974,19 @@ do_every_frame("AudioChecklist_updateChecklist()")
 do_often("AudioChecklist_doOften()")
 do_every_frame("AudioChecklist_doEveryFrame()")
 
--- Check whether automatic completion of checklist items which requires a manual check should be enabled
+-- Upgrade the old configurations
 if preferences.get("AutoDoneEnabled", "0") == "1" then
-	sopExecutor.enableAutoDone()
+	preferences.set("ExecutionMode", tostring(sopExecutor.executionModeAutoDone))
 end
 
--- Get the preferred monitor
+-- Remove the obsolete configurations
+preferences.remove("AutoDoneEnabled")
+
+-- Set the preferred monitor
 preferredMonitorIndex = tonumber(preferences.get("PreferredMonitorNumber", "1"))
 
--- Set the configured delays
+-- Set the configuration of the SOP executor
+sopExecutor.setExecutionMode(tonumber(preferences.get("ExecutionMode", tostring(sopExecutor.executionModeDefault))))
 sopExecutor.setResponseDelay(tonumber(preferences.get("ResponseDelay", "0.3")))
 sopExecutor.setNextChecklistItemDelay(tonumber(preferences.get("NextItemDelay", "0.3")))
 sopExecutor.setVoiceVolume(tonumber(preferences.get("VoiceVolume", "1")))

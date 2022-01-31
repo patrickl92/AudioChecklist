@@ -9,13 +9,19 @@
 -- @module sopExecutor
 -- @author Patrick Lang
 -- @copyright 2022 Patrick Lang
-local sopExecutor = {}
+local sopExecutor = {
+    executionModeDefault = 0,
+    executionModeAutoDone = 1,
+    executionModeManual = 2
+}
 
 local utils = require "audiochecklist.utils"
 local audio = require "audiochecklist.audio"
 
 local paused = false
 local pauseStartTime = 0
+
+local executionMode = sopExecutor.executionModeDefault
 
 local activeSOP = nil
 local challengeVoice = nil
@@ -24,7 +30,6 @@ local activeVoice = nil
 
 local voiceVolume = 1
 
-local checklistItemAutoDone = false
 local responseDelay = 0.3
 local nextChecklistItemDelay = 0.3
 local responseDelayFinishedTime = 0
@@ -73,6 +78,11 @@ end
 --- Starts playing the response sound for the given checklist item.
 -- @tparam checklistItem checklistItem The checklist item.
 local function playResponse(checklistItem)
+    if executionMode == sopExecutor.executionModeManual then
+        -- Do not play any responses if the manual mode is active
+        return
+    end
+
     local key = checklistItem:getResponseKey()
 
     utils.logDebug("SopExecutor", "Playing response sound '" .. key .. "'")
@@ -83,10 +93,40 @@ end
 
 --- Starts playing a random fail sound.
 local function playFailResponse()
+    if executionMode == sopExecutor.executionModeManual then
+        -- Do not play any responses if the manual mode is active
+        return
+    end
+
     utils.logDebug("SopExecutor", "Playing random fail sound")
 
     activateVoice(responseVoice)
     responseVoice:playFailSound()
+end
+
+--- Sets the execution mode.
+--
+-- Supported modes:
+--
+-- 0: Default execution mode. Automatic checks are performed and manual checklist items needs to be completed manually.
+-- 1: Auto Done. Automatic checks are performed and manual checklist items are automatically completed.
+-- 2: Manual. No automatic checks are performed and each checklist item needs to be completed manually. Also does not play any response sound.
+-- @tparam mode number The new execution mode.
+function sopExecutor.setExecutionMode(mode)
+    utils.verifyType("mode", mode, "number")
+
+    if mode ~= sopExecutor.executionModeDefault and mode ~= sopExecutor.executionModeAutoDone and mode ~= sopExecutor.executionModeManual then
+        error("Invalid execution mode: " .. tostring(mode))
+    end
+
+    utils.logInfo("SopExecutor", "Setting execution mode to " .. tostring(mode))
+    executionMode = mode
+end
+
+--- Gets the current execution mode.
+-- @treturn number The current execution mode.
+function sopExecutor.getExecutionMode()
+    return executionMode
 end
 
 --- Sets the active standard operating procedure.
@@ -272,7 +312,7 @@ function sopExecutor.update()
                 checklistItem:onCompleted()
                 executeCallbacks(checklistItemCompletedCallbacks, checklistItem, checklist, activeSOP)
                 playResponse(checklistItem)
-            elseif not checklistItem:isManualItem() then
+            elseif not checklistItem:isManualItem() and executionMode ~= sopExecutor.executionModeManual then
                 if checklistItem:evaluate() then
                     utils.logDebug("SopExecutor", "Conditions of the checklist item are met, setting it to completed")
 
@@ -290,7 +330,7 @@ function sopExecutor.update()
                     executeCallbacks(checklistItemFailedCallbacks, checklistItem, checklist, activeSOP)
                     playFailResponse()
                 end
-            elseif checklistItemAutoDone then
+            elseif executionMode == sopExecutor.executionModeAutoDone then
                 utils.logDebug("SopExecutor", "Automatic completion of manual checklist items is enabled, setting it to completed")
 
                 -- Automatic completion of manual checklist items is enabled, so set it to completed and play the response sound
@@ -382,24 +422,6 @@ function sopExecutor.setCurrentChecklistItemDone()
             end
         end
     end
-end
-
---- Enables the automatic completion of manual checklist items.
-function sopExecutor.enableAutoDone()
-    utils.logDebug("SopExecutor", "Auto completion of manual checklist items enabled")
-    checklistItemAutoDone = true
-end
-
---- Disables the automatic completion of manual checklist items.
-function sopExecutor.disableAutoDone()
-    utils.logDebug("SopExecutor", "Auto completion of manual checklist items disabled")
-    checklistItemAutoDone = false
-end
-
---- Gets a value indicating whether the automatic completion of manual checklist items is currently enabled.
--- @treturn bool <code>True</code> if the automatic completion of manual checklist items is currently enabled, otherwise <code>false</code>.
-function sopExecutor.autoDoneEnabled()
-	return checklistItemAutoDone
 end
 
 --- Sets the delay for playing the response sound.
