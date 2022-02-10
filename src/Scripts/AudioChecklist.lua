@@ -4,6 +4,7 @@ local sopExecutor = require "audiochecklist.sopexecutor"
 local checklist = require "audiochecklist.checklist"
 local checklistItem = require "audiochecklist.checklistitem"
 local preferences = require "audiochecklist.preferences"
+local emptyVoice = require "audiochecklist.emptyvoice"
 
 local initialized = false
 
@@ -125,6 +126,9 @@ local function initialize()
 				addedPlanes[plane] = true
 			end
 		end
+
+        -- Add an empty response voice to each SOP
+        sop:addResponseVoice(emptyVoice:new("Me"))
 	end
 
 	table.sort(allSOPs, function (left, right) return left:getName() < right:getName() end)
