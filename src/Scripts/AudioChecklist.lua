@@ -29,10 +29,16 @@ local buttonColorGreenDisabled = 0x80267F00
 
 -- Define the texts for the execution modes
 local executionModes = { sopExecutor.executionModeDefault, sopExecutor.executionModeAutoDone, sopExecutor.executionModeManual }
+
 local executionModeTexts = {}
 executionModeTexts[sopExecutor.executionModeDefault] = "Default"
 executionModeTexts[sopExecutor.executionModeAutoDone] = "Auto Done"
 executionModeTexts[sopExecutor.executionModeManual] = "Manual"
+
+local executionModeToolTips = {}
+executionModeToolTips[sopExecutor.executionModeDefault] = "Performs automatic checks. Manual checklist items need to be completed by you"
+executionModeToolTips[sopExecutor.executionModeAutoDone] = "Performs automatic checks. Automatically completes the manual checklist items"
+executionModeToolTips[sopExecutor.executionModeManual] = "No automatic checks are performed. Each checklist item needs to be completed by you"
 
 -- Define the variables used for handling different monitors
 local preferredMonitorIndex = 1
@@ -613,6 +619,14 @@ function AudioChecklist_preferencesWindowOnRender()
             if imgui.Selectable(executionModeTexts[mode], sopExecutor.getExecutionMode() == mode) then
                 sopExecutor.setExecutionMode(mode)
 		        preferences.set("ExecutionMode", tostring(mode))
+            end
+
+            if imgui.IsItemHovered() then
+                imgui.BeginTooltip()
+                imgui.PushTextWrapPos(200)
+                imgui.TextUnformatted(executionModeToolTips[mode])
+                imgui.PopTextWrapPos()
+                imgui.EndTooltip()
             end
         end
 
