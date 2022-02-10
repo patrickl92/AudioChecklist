@@ -78,11 +78,6 @@ end
 --- Starts playing the response sound for the given checklist item.
 -- @tparam checklistItem checklistItem The checklist item.
 local function playResponse(checklistItem)
-    if executionMode == sopExecutor.executionModeManual then
-        -- Do not play any responses if the manual mode is active
-        return
-    end
-
     local key = checklistItem:getResponseKey()
 
     utils.logDebug("SopExecutor", "Playing response sound '" .. key .. "'")
@@ -93,11 +88,6 @@ end
 
 --- Starts playing a random fail sound.
 local function playFailResponse()
-    if executionMode == sopExecutor.executionModeManual then
-        -- Do not play any responses if the manual mode is active
-        return
-    end
-
     utils.logDebug("SopExecutor", "Playing random fail sound")
 
     activateVoice(responseVoice)
