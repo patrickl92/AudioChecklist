@@ -167,6 +167,7 @@ describe("SOPExecutor",function()
         stub.new(responseVoice, "playFailSound", function() responseVoiceFinished = false end)
         stub.new(responseVoice, "isFinished", function() return responseVoiceFinished end)
 
+        sopExecutor.setExecutionMode(sopExecutor.executionModeDefault)
         sopExecutor.setResponseDelay(0)
         sopExecutor.setNextChecklistItemDelay(0)
 
@@ -1076,18 +1077,59 @@ describe("SOPExecutor",function()
         assert.is_nil(sop:getActiveChecklist())
     end)
 
-    it("should execute a checklist with multiple items", function()
+    it("should not evaluate an automatic checklist item in manual mode", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem = createAutomaticChecklistItem()
+
+        checklist:addItem(checklistItem)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setExecutionMode(sopExecutor.executionModeManual)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateInProgress, checklistItem:getState())
+        assert.stub(checklistItem.evaluate).was_not_called()
+        assert.stub(checklistItem.onCompleted).was_not_called()
+        assert.stub(responseVoice.playResponseSound).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+
+        sopExecutor.setCurrentChecklistItemDone()
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem:getState())
+        assert.stub(checklistItem.onCompleted).was.called(1)
+        assert.stub(responseVoice.playResponseSound).was.called(1)
+        assert.stub(responseVoice.playResponseSound).was.called_with(responseVoice, "TheResponseKey")
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.is_nil(sop:getActiveChecklist())
+    end)
+
+    it("should execute a checklist with multiple items in execution mode Default", function()
         local sop = createSOP()
         local checklist = createChecklist()
         local checklistItem1 = createSoundChecklistItem()
         local checklistItem2 = createAutomaticChecklistItem()
-        local checklistItem3 = createSoundChecklistItem()
+        local checklistItem3 = createManualChecklistItem()
+        local checklistItem4 = createSoundChecklistItem()
 
         checklist:addItem(checklistItem1)
         checklist:addItem(checklistItem2)
         checklist:addItem(checklistItem3)
+        checklist:addItem(checklistItem4)
         sop:addChecklist(checklist)
 
+        sopExecutor.setExecutionMode(sopExecutor.executionModeDefault)
         sopExecutor.setActiveSOP(sop)
         sopExecutor.startChecklist(checklist)
 
@@ -1096,6 +1138,7 @@ describe("SOPExecutor",function()
         assert.stub(checklistItem1.onStarted).was.called(1)
         assert.stub(checklistItem2.onStarted).was_not_called()
         assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.stub(checklistItem4.onStarted).was_not_called()
         assert.are.equal(checklistItem1, checklist:getActiveItem())
 
         challengeVoiceFinished = true
@@ -1104,9 +1147,11 @@ describe("SOPExecutor",function()
         assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
         assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
         assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
         assert.stub(checklistItem1.onCompleted).was.called(1)
         assert.stub(checklistItem2.onCompleted).was_not_called()
         assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.stub(checklistItem4.onCompleted).was_not_called()
         assert.are.equal(checklist.stateInProgress, checklist:getState())
         assert.are.equal(checklistItem2, checklist:getActiveItem())
 
@@ -1115,9 +1160,11 @@ describe("SOPExecutor",function()
         assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
         assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
         assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
         assert.stub(checklistItem1.onStarted).was.called(1)
         assert.stub(checklistItem2.onStarted).was.called(1)
         assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.stub(checklistItem4.onStarted).was_not_called()
 
         challengeVoiceFinished = true
         sopExecutor.update()
@@ -1125,6 +1172,7 @@ describe("SOPExecutor",function()
         assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
         assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
         assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
         assert.are.equal(checklistItem2, checklist:getActiveItem())
 
         responseVoiceFinished = true
@@ -1133,9 +1181,11 @@ describe("SOPExecutor",function()
         assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
         assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
         assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
         assert.stub(checklistItem1.onCompleted).was.called(1)
         assert.stub(checklistItem2.onCompleted).was.called(1)
         assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.stub(checklistItem4.onCompleted).was_not_called()
         assert.are.equal(checklist.stateInProgress, checklist:getState())
         assert.are.equal(checklistItem3, checklist:getActiveItem())
 
@@ -1144,9 +1194,163 @@ describe("SOPExecutor",function()
         assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
         assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
         assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
         assert.stub(checklistItem1.onStarted).was.called(1)
         assert.stub(checklistItem2.onStarted).was.called(1)
         assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.stub(checklistItem4.onStarted).was_not_called()
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        sopExecutor.setCurrentChecklistItemDone()
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.stub(checklistItem4.onStarted).was.called(1)
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.stub(checklistItem4.onCompleted).was.called(1)
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+        assert.is_nil(sop:getActiveChecklist())
+    end)
+
+    it("should execute a checklist with multiple items in execution mode Auto Done", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem1 = createSoundChecklistItem()
+        local checklistItem2 = createAutomaticChecklistItem()
+        local checklistItem3 = createManualChecklistItem()
+        local checklistItem4 = createSoundChecklistItem()
+
+        checklist:addItem(checklistItem1)
+        checklist:addItem(checklistItem2)
+        checklist:addItem(checklistItem3)
+        checklist:addItem(checklistItem4)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setExecutionMode(sopExecutor.executionModeAutoDone)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was_not_called()
+        assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.stub(checklistItem4.onStarted).was_not_called()
+        assert.are.equal(checklistItem1, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.stub(checklistItem4.onStarted).was_not_called()
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.stub(checklistItem4.onStarted).was_not_called()
         assert.are.equal(checklistItem3, checklist:getActiveItem())
 
         challengeVoiceFinished = true
@@ -1155,11 +1359,215 @@ describe("SOPExecutor",function()
         assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
         assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
         assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
         assert.stub(checklistItem1.onCompleted).was.called(1)
         assert.stub(checklistItem2.onCompleted).was.called(1)
         assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.stub(checklistItem4.onStarted).was.called(1)
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.stub(checklistItem4.onCompleted).was.called(1)
         assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+        assert.is_nil(sop:getActiveChecklist())
+    end)
+
+    it("should execute a checklist with multiple items in execution mode Manual", function()
+        local sop = createSOP()
+        local checklist = createChecklist()
+        local checklistItem1 = createSoundChecklistItem()
+        local checklistItem2 = createAutomaticChecklistItem()
+        local checklistItem3 = createManualChecklistItem()
+        local checklistItem4 = createSoundChecklistItem()
+
+        checklist:addItem(checklistItem1)
+        checklist:addItem(checklistItem2)
+        checklist:addItem(checklistItem3)
+        checklist:addItem(checklistItem4)
+        sop:addChecklist(checklist)
+
+        sopExecutor.setExecutionMode(sopExecutor.executionModeManual)
+        sopExecutor.setActiveSOP(sop)
+        sopExecutor.startChecklist(checklist)
+
+        sopExecutor.update()
+
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was_not_called()
+        assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.stub(checklistItem4.onStarted).was_not_called()
+        assert.are.equal(checklistItem1, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was_not_called()
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was_not_called()
+        assert.stub(checklistItem4.onStarted).was_not_called()
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        sopExecutor.setCurrentChecklistItemDone()
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.are.equal(checklistItem2, checklist:getActiveItem())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was_not_called()
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
         assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.stub(checklistItem4.onStarted).was_not_called()
+        assert.are.equal(checklistItem3, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        sopExecutor.setCurrentChecklistItemDone()
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+
+        responseVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateNotStarted, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.stub(checklistItem4.onCompleted).was_not_called()
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateInProgress, checklistItem4:getState())
+        assert.stub(checklistItem1.onStarted).was.called(1)
+        assert.stub(checklistItem2.onStarted).was.called(1)
+        assert.stub(checklistItem3.onStarted).was.called(1)
+        assert.stub(checklistItem4.onStarted).was.called(1)
+        assert.are.equal(checklist.stateInProgress, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
+
+        challengeVoiceFinished = true
+        sopExecutor.update()
+
+        assert.are.equal(checklistItem.stateSuccess, checklistItem1:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem2:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem3:getState())
+        assert.are.equal(checklistItem.stateSuccess, checklistItem4:getState())
+        assert.stub(checklistItem1.onCompleted).was.called(1)
+        assert.stub(checklistItem2.onCompleted).was.called(1)
+        assert.stub(checklistItem3.onCompleted).was.called(1)
+        assert.stub(checklistItem4.onCompleted).was.called(1)
+        assert.are.equal(checklist.stateCompleted, checklist:getState())
+        assert.are.equal(checklistItem4, checklist:getActiveItem())
         assert.is_nil(sop:getActiveChecklist())
     end)
 
