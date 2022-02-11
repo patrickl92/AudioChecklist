@@ -6,7 +6,7 @@ describe("EmptyVoice", function()
     end
 
     setup(function()
-        emptyVoice = require "audiochecklist.emptyVoice"
+        emptyVoice = require "audiochecklist.emptyvoice"
     end)
 
     teardown(function()
