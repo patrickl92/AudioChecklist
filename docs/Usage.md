@@ -87,5 +87,4 @@ A new window will be opened, which contains all available preferences:
   * Default value: 100 %
 
 ## Limitations
-* Hitting the assigned key or joystick button to show the checklist window is not always recognized if it is done multiple times in a short time period (e.g. closing the window and then immediately opening it again may won’t work).
-* The minimum resolution of time is only one second. This can lead to sounds being played a second time if a checklist is resumed after it was paused right when the sound would finish playing. This may also cause sounds overlapping each other in this case.
+* Hitting the assigned key or joystick button to show the checklist window is not always recognized if it is done multiple times in a short time period (e.g. closing the window and then immediately opening it again may won’t work)
