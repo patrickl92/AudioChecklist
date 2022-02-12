@@ -24,6 +24,8 @@ If there are no SOPs installed for the current plane, then the list of SOPs is e
 
 A SOP can come with different voices, which can be selected in the next two dropdown menus. The pilot flying (PF) will read the responses of a checklist and the pilot monitoring (PM) will read the challenges.
 
+Each SOP contains a special voice for the PF, which is named “Me”. This voice does not play any responses, so it can be used to response to the challenges yourself. This voice should only be used when the “Manual” execution mode is set (see Preferences).
+
 Click the button `Start` to confirm your choice. You can switch to a different SOP any time by selecting the menu entry `Plugins > FlyWithLua > FlyWithLua Macros > Audio Checklist: Switch SOP`:
 
 ![Switch SOP](images/SwitchSOP.png)
@@ -32,7 +34,7 @@ Switching the SOP resets the state of the current checklists (i.e. they are no l
 
 ## Executing a checklist
 
-Once a SOP has been selected, all available checklists are listed: 
+Once a SOP has been selected, all available checklists are listed:
 
 ![Checklist window](images/ChecklistWindow.png)
 
@@ -66,9 +68,14 @@ A new window will be opened, which contains all available preferences:
 
 ![Preferences](images/Preferences.png)
 
-* Enable Auto Done
-  * If checked, the manual checklist items are finished automatically
-  * Default value: False
+* Execution Mode
+  * Default
+    * Performs automatic checks. Manual checklist items need to be completed by you
+  * Auto Done
+    * Performs automatic checks. Automatically completes the manual checklist items
+  * Manual
+    * No automatic checks are performed. Each checklist item needs to be completed by you
+  * Default value: Default
 * Response Delay
   * The delay time in seconds between the challenge sound and the response sound. It is also used as the delay between the fail sound and the response sound, if an automatic checklist item has failed
   * Default value: 0.3 seconds
