@@ -170,13 +170,18 @@ end
 --- Reads an integer DataRef from X-Plane.
 -- Reading DataRef values is a relatively slow operation and should only be done if necessary.
 -- @tparam string dataRefName The name of the DataRef.
--- @treturn ?number The value of the DataRef or <code>nil</code>, if the DataRef was not found.
-function utils.readDataRefInteger(dataRefName)
+-- @tparam ?number defaultValue The default value to return if the DataRef was not found.
+-- @treturn ?number The value of the DataRef or the default value, if the DataRef was not found.
+function utils.readDataRefInteger(dataRefName, defaultValue)
     utils.verifyType("dataRefName", dataRefName, "string")
+
+    if defaultValue ~= nil then
+        utils.verifyType("defaultValue", defaultValue, "number")
+    end
 
     local dataRef = getDataRef(dataRefName)
     if not dataRef then
-        return nil
+        return defaultValue
     end
 
     return XPLMGetDatai(dataRef)
@@ -185,13 +190,18 @@ end
 --- Reads a float DataRef from X-Plane.
 -- Reading DataRef values is a relatively slow operation and should only be done if necessary.
 -- @tparam string dataRefName The name of the DataRef.
--- @treturn ?number The value of the DataRef or <code>nil</code>, if the DataRef was not found.
-function utils.readDataRefFloat(dataRefName)
+-- @tparam ?number defaultValue The default value to return if the DataRef was not found.
+-- @treturn ?number The value of the DataRef or the default value, if the DataRef was not found.
+function utils.readDataRefFloat(dataRefName, defaultValue)
     utils.verifyType("dataRefName", dataRefName, "string")
+
+    if defaultValue ~= nil then
+        utils.verifyType("defaultValue", defaultValue, "number")
+    end
 
     local dataRef = getDataRef(dataRefName)
     if not dataRef then
-        return nil
+        return defaultValue
     end
 
     return XPLMGetDataf(dataRef)
@@ -203,7 +213,7 @@ end
 -- @tparam number startIndex The start index of the range to check.
 -- @tparam number count The count of items to check.
 -- @tparam func verifyFunction The function which will receive each item and returns whether the item meets its condition (<code>true</code> or <code>false</code>)..
--- @treturn ?bool <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+-- @treturn bool <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
 -- @usage utils.checkArrayValuesAllInteger("sim/flightmodel/engine/ENGN_running", 0, 2, function(v) return v == 1 end) -- Checks if engines 1 and 2 are running
 function utils.checkArrayValuesAllInteger(dataRefName, startIndex, count, verifyFunction)
     utils.verifyType("dataRefName", dataRefName, "string")
@@ -213,7 +223,7 @@ function utils.checkArrayValuesAllInteger(dataRefName, startIndex, count, verify
 
     local dataRef = getDataRef(dataRefName)
     if not dataRef then
-        return nil
+        return false
     end
 
     return utils.checkArrayValuesAll(XPLMGetDatavi(dataRef, startIndex, count), verifyFunction)
@@ -225,7 +235,7 @@ end
 -- @tparam number startIndex The start index of the range to check.
 -- @tparam number count The count of items to check.
 -- @tparam func verifyFunction The function which will receive each item and returns whether the item meets its condition (<code>true</code> or <code>false</code>)..
--- @treturn ?bool <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+-- @treturn bool <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
 -- @usage utils.checkArrayValuesAnyInteger("sim/flightmodel/engine/ENGN_running", 0, 2, function(v) return v == 1 end) -- Checks if any engine is running
 function utils.checkArrayValuesAnyInteger(dataRefName, startIndex, count, verifyFunction)
     utils.verifyType("dataRefName", dataRefName, "string")
@@ -235,7 +245,7 @@ function utils.checkArrayValuesAnyInteger(dataRefName, startIndex, count, verify
 
     local dataRef = getDataRef(dataRefName)
     if not dataRef then
-        return nil
+        return false
     end
 
     return utils.checkArrayValuesAny(XPLMGetDatavi(dataRef, startIndex, count), verifyFunction)
@@ -247,7 +257,7 @@ end
 -- @tparam number startIndex The start index of the range to check.
 -- @tparam number count The count of items to check.
 -- @tparam func verifyFunction The function which will receive each item and returns whether the item meets its condition (<code>true</code> or <code>false</code>)..
--- @treturn ?bool <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+-- @treturn bool <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
 -- @usage utils.checkArayValuesAllFloat("laminar/B738/flap_indicator", 0, 2, function(v) return v == 0 end) -- Checks if all flaps are up
 function utils.checkArrayValuesAllFloat(dataRefName, startIndex, count, verifyFunction)
     utils.verifyType("dataRefName", dataRefName, "string")
@@ -257,7 +267,7 @@ function utils.checkArrayValuesAllFloat(dataRefName, startIndex, count, verifyFu
 
     local dataRef = getDataRef(dataRefName)
     if not dataRef then
-        return nil
+        return false
     end
 
     return utils.checkArrayValuesAll(XPLMGetDatavf(dataRef, startIndex, count), verifyFunction)
@@ -269,7 +279,7 @@ end
 -- @tparam number startIndex The start index of the range to check.
 -- @tparam number count The count of items to check.
 -- @tparam func verifyFunction The function which will receive each item and returns whether the item meets its condition (<code>true</code> or <code>false</code>)..
--- @treturn ?bool <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+-- @treturn bool <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
 -- @usage utils.checkArrayValuesAnyFloat("sim/cockpit2/engine/actuators/throttle_ratio", 0, 2, function(v) return v >= 0.5 end) -- Checks if any thrust lever is advanced 50% or more
 function utils.checkArrayValuesAnyFloat(dataRefName, startIndex, count, verifyFunction)
     utils.verifyType("dataRefName", dataRefName, "string")
@@ -279,7 +289,7 @@ function utils.checkArrayValuesAnyFloat(dataRefName, startIndex, count, verifyFu
 
     local dataRef = getDataRef(dataRefName)
     if not dataRef then
-        return nil
+        return false
     end
 
     return utils.checkArrayValuesAny(XPLMGetDatavf(dataRef, startIndex, count), verifyFunction)
