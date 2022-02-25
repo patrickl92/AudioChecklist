@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/emptyvoice.html">emptyvoice</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><strong>voice</strong></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>voice</code></h1>
+<p>Acts as an interface for a voice implementation.</p>
+<p>
+ A voice is responsible for playing a specified challenge or response sound based on the provided key.
+ It may can be paused, resumed and stopped.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#voice:new">voice:new (name)</a></td>
+	<td class="summary">Creates a new voice.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:getName">voice:getName ()</a></td>
+	<td class="summary">Gets the name of the voice.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:setVolume">voice:setVolume (volume)</a></td>
+	<td class="summary">Sets the volume of the voice.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:activateChallengeSounds">voice:activateChallengeSounds ()</a></td>
+	<td class="summary">Gets called when the voice is selected for providing the audio output for the challenges.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:activateResponseSounds">voice:activateResponseSounds ()</a></td>
+	<td class="summary">Gets called when the voice is selected for providing the audio output for the responses and failures.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:deactivateChallengeSounds">voice:deactivateChallengeSounds ()</a></td>
+	<td class="summary">Gets called when the voice is no longer an active audio provider for the challenges.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:deactivateResponseSounds">voice:deactivateResponseSounds ()</a></td>
+	<td class="summary">Gets called when the voice is no longer an active audio provider for the responses and failures.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:playChallengeSound">voice:playChallengeSound (key)</a></td>
+	<td class="summary">Starts playing the challenge sound with the specified key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:playResponseSound">voice:playResponseSound (key)</a></td>
+	<td class="summary">Starts playing the response sound with the specified key.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:playFailSound">voice:playFailSound ()</a></td>
+	<td class="summary">Starts playing a fail sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:pause">voice:pause ()</a></td>
+	<td class="summary">Pauses the active sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:resume">voice:resume ()</a></td>
+	<td class="summary">Resumes the active sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:stop">voice:stop ()</a></td>
+	<td class="summary">Stops playing the active sound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#voice:isFinished">voice:isFinished ()</a></td>
+	<td class="summary">Checks whether the active sound has finished playing.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "voice:new"></a>
+    <strong>voice:new (name)</strong>
+    </dt>
+    <dd>
+    Creates a new voice.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The name of the voice.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/voice.html#">voice</a></span>
+        The created voice
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:getName"></a>
+    <strong>voice:getName ()</strong>
+    </dt>
+    <dd>
+    Gets the name of the voice.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The name of the voice.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:setVolume"></a>
+    <strong>voice:setVolume (volume)</strong>
+    </dt>
+    <dd>
+    Sets the volume of the voice.
+ A value of 1 means 100% (full volume), a value of 0.5 means 50% (half the volume).
+ This function should be implemented in a derived voice class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">volume</span>
+            <span class="types"><span class="type">numer</span></span>
+         The volume to use.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:activateChallengeSounds"></a>
+    <strong>voice:activateChallengeSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is selected for providing the audio output for the challenges.
+ Can be used to initialize the voice. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:activateResponseSounds"></a>
+    <strong>voice:activateResponseSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is selected for providing the audio output for the responses and failures.
+ Can be used to initialize the voice. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:deactivateChallengeSounds"></a>
+    <strong>voice:deactivateChallengeSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is no longer an active audio provider for the challenges.
+ Can be used to release any resources. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:deactivateResponseSounds"></a>
+    <strong>voice:deactivateResponseSounds ()</strong>
+    </dt>
+    <dd>
+    Gets called when the voice is no longer an active audio provider for the responses and failures.
+ Can be used to release any resources. This function does nothing in this implementation.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:playChallengeSound"></a>
+    <strong>voice:playChallengeSound (key)</strong>
+    </dt>
+    <dd>
+    Starts playing the challenge sound with the specified key.
+ This function should be implemented in a derived voice class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the challenge sound
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:playResponseSound"></a>
+    <strong>voice:playResponseSound (key)</strong>
+    </dt>
+    <dd>
+    Starts playing the response sound with the specified key.
+ This function should be implemented in a derived voice class.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the response sound
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:playFailSound"></a>
+    <strong>voice:playFailSound ()</strong>
+    </dt>
+    <dd>
+    Starts playing a fail sound.
+ This function should be implemented in a derived voice class.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:pause"></a>
+    <strong>voice:pause ()</strong>
+    </dt>
+    <dd>
+    Pauses the active sound.
+ This function should be implemented in a derived voice class.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:resume"></a>
+    <strong>voice:resume ()</strong>
+    </dt>
+    <dd>
+    Resumes the active sound.
+ This function should be implemented in a derived voice class.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:stop"></a>
+    <strong>voice:stop ()</strong>
+    </dt>
+    <dd>
+    Stops playing the active sound.
+ This function should be implemented in a derived voice class.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "voice:isFinished"></a>
+    <strong>voice:isFinished ()</strong>
+    </dt>
+    <dd>
+    Checks whether the active sound has finished playing.
+ This function should be implemented in a derived voice class.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Always <code>true</code>.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-02-25 19:40:03 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
