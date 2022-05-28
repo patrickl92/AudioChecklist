@@ -256,7 +256,7 @@ local function updateChecklistWindowSize()
 
 	-- Used a fixed default width, because it does not work to calculate the current width if the window is popped out
 	local requiredWidth = 332
-	local requiredHeight = checklistWindowTop - checklistWindowBottom
+	local requiredHeight = 0
 	local maxHeight = xPlaneWindowTop - xPlaneWindowBottom - 100
 
 	-- Calculate the required height based on the content
