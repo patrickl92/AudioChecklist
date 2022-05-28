@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/emptyvoice.html">emptyvoice</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><strong>manualDynamicResponseChecklistItem</strong></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>manualDynamicResponseChecklistItem</code></h1>
+<p>Inherits from the manualChecklistItem class and provides a dynamic key for the response sound.</p>
+<p>
+ It uses a callback to get the actual key for the response sound.</p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../classes/manualChecklistItem.html#">manualChecklistItem</a>
+    </ul>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#manualDynamicResponseChecklistItem:new">manualDynamicResponseChecklistItem:new (challengeText, responseText, challengeKey, responseKeyFunction)</a></td>
+	<td class="summary">Creates a checklist item, which needs to be set to completed manually.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#manualDynamicResponseChecklistItem:getResponseKey">manualDynamicResponseChecklistItem:getResponseKey ()</a></td>
+	<td class="summary">Gets the key of the response sound.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "manualDynamicResponseChecklistItem:new"></a>
+    <strong>manualDynamicResponseChecklistItem:new (challengeText, responseText, challengeKey, responseKeyFunction)</strong>
+    </dt>
+    <dd>
+    Creates a checklist item, which needs to be set to completed manually.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">challengeText</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The challenge text of the checklist item.
+        </li>
+        <li><span class="parameter">responseText</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The response text of the checklist item.
+        </li>
+        <li><span class="parameter">challengeKey</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the challenge sound.
+        </li>
+        <li><span class="parameter">responseKeyFunction</span>
+            <span class="types"><span class="type">func</span></span>
+         The function to get the key of the response sound to use.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/manualDynamicResponseChecklistItem.html#">manualDynamicResponseChecklistItem</a></span>
+        The created checklist item.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "manualDynamicResponseChecklistItem:getResponseKey"></a>
+    <strong>manualDynamicResponseChecklistItem:getResponseKey ()</strong>
+    </dt>
+    <dd>
+    Gets the key of the response sound.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The key of the response sound.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-05-28 12:02:07 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

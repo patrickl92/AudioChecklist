@@ -1,0 +1,511 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><strong>checklist</strong></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/emptyvoice.html">emptyvoice</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><a href="../modules/preferences.html">preferences</a></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>checklist</code></h1>
+<p>Represents a checklist.</p>
+<p>
+ Each checklist contains an array of checklist items and an active checklist item. The active checklist item indicates the currently executed checklist item.
+<p> Callbacks can be added to react to the checklist getting started, stopped and completed.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#checklist:new">checklist:new (title)</a></td>
+	<td class="summary">Creates a new checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:getTitle">checklist:getTitle ()</a></td>
+	<td class="summary">Gets the title of the checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:setState">checklist:setState (state)</a></td>
+	<td class="summary">Sets the state of the checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:getState">checklist:getState ()</a></td>
+	<td class="summary">Gets the current state of the checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:addItem">checklist:addItem (checklistItem)</a></td>
+	<td class="summary">Adds an item to the checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:getAllItems">checklist:getAllItems ()</a></td>
+	<td class="summary">Gets all items of the checklist.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:getActiveItem">checklist:getActiveItem ()</a></td>
+	<td class="summary">Gets the active checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:setActiveItemNumber">checklist:setActiveItemNumber (itemNumber)</a></td>
+	<td class="summary">Sets the active checklist item number.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:hasNextItem">checklist:hasNextItem ()</a></td>
+	<td class="summary">Checks whether there is another checklist item after the active checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:setNextItemActive">checklist:setNextItemActive ()</a></td>
+	<td class="summary">Activates the next checklist item.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:reset">checklist:reset ()</a></td>
+	<td class="summary">Resets the state of the checklist and its checklist items.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:addStartedCallback">checklist:addStartedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if the checklist is started.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:addCancelledCallback">checklist:addCancelledCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if the checklist is cancelled.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:addCompletedCallback">checklist:addCompletedCallback (callback)</a></td>
+	<td class="summary">Adds a callback which is executed if the checklist is completed.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:onStarted">checklist:onStarted ()</a></td>
+	<td class="summary">Executes the started callbacks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:onCancelled">checklist:onCancelled ()</a></td>
+	<td class="summary">Executes the cancelled callbacks.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#checklist:onCompleted">checklist:onCompleted ()</a></td>
+	<td class="summary">Executes the completed callbacks.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "checklist:new"></a>
+    <strong>checklist:new (title)</strong>
+    </dt>
+    <dd>
+    Creates a new checklist.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">title</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The title of the checklist.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/checklist.html#">checklist</a></span>
+        The created checklist.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:getTitle"></a>
+    <strong>checklist:getTitle ()</strong>
+    </dt>
+    <dd>
+    Gets the title of the checklist.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The title of the checklist.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:setState"></a>
+    <strong>checklist:setState (state)</strong>
+    </dt>
+    <dd>
+    Sets the state of the checklist.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">state</span>
+            <span class="types"><span class="type">number</span></span>
+         The new state.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:getState"></a>
+    <strong>checklist:getState ()</strong>
+    </dt>
+    <dd>
+    Gets the current state of the checklist.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        state The state of the checklist.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:addItem"></a>
+    <strong>checklist:addItem (checklistItem)</strong>
+    </dt>
+    <dd>
+    Adds an item to the checklist.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">checklistItem</span>
+            <span class="types"><a class="type" href="../classes/checklistItem.html#">checklistItem</a></span>
+         The item to add.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:getAllItems"></a>
+    <strong>checklist:getAllItems ()</strong>
+    </dt>
+    <dd>
+    Gets all items of the checklist.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">tab</span></span>
+        An array which contains all checklist items.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:getActiveItem"></a>
+    <strong>checklist:getActiveItem ()</strong>
+    </dt>
+    <dd>
+    Gets the active checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types">optional <a class="type" href="../classes/checklistItem.html#">checklistItem</a></span>
+        The active checklist item.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:setActiveItemNumber"></a>
+    <strong>checklist:setActiveItemNumber (itemNumber)</strong>
+    </dt>
+    <dd>
+    Sets the active checklist item number.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">itemNumber</span>
+            <span class="types"><span class="type">number</span></span>
+         The new active checklist item number.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the itemNumber does not point to an existing item.
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:hasNextItem"></a>
+    <strong>checklist:hasNextItem ()</strong>
+    </dt>
+    <dd>
+    Checks whether there is another checklist item after the active checklist item.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if there are still checklist items left, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:setNextItemActive"></a>
+    <strong>checklist:setNextItemActive ()</strong>
+    </dt>
+    <dd>
+    Activates the next checklist item.
+ If there is no checklist item after the current active checklist item, then the active checklist item becomes <code>nil</code>.
+
+
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the active item is the last item
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:reset"></a>
+    <strong>checklist:reset ()</strong>
+    </dt>
+    <dd>
+    Resets the state of the checklist and its checklist items.
+ The active checklist item is set to the first checklist item.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:addStartedCallback"></a>
+    <strong>checklist:addStartedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if the checklist is started.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myChecklist:addStartedCallback(<span class="keyword">function</span>() <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "checklist:addCancelledCallback"></a>
+    <strong>checklist:addCancelledCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if the checklist is cancelled.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myChecklist:addCancelledCallback(<span class="keyword">function</span>() <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "checklist:addCompletedCallback"></a>
+    <strong>checklist:addCompletedCallback (callback)</strong>
+    </dt>
+    <dd>
+    Adds a callback which is executed if the checklist is completed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">func</span></span>
+         The callback to add.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myChecklist:addCompletedCallback(<span class="keyword">function</span>() <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "checklist:onStarted"></a>
+    <strong>checklist:onStarted ()</strong>
+    </dt>
+    <dd>
+    Executes the started callbacks.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:onCancelled"></a>
+    <strong>checklist:onCancelled ()</strong>
+    </dt>
+    <dd>
+    Executes the cancelled callbacks.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "checklist:onCompleted"></a>
+    <strong>checklist:onCompleted ()</strong>
+    </dt>
+    <dd>
+    Executes the completed callbacks.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-05-28 12:02:07 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

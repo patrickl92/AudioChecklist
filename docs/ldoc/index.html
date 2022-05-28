@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="modules/audio.html">audio</a></li>
+  <li><a href="modules/preferences.html">preferences</a></li>
+  <li><a href="modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="modules/utils.html">utils</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="classes/checklist.html">checklist</a></li>
+  <li><a href="classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="classes/emptyvoice.html">emptyvoice</a></li>
+  <li><a href="classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="classes/sound.html">sound</a></li>
+  <li><a href="classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="classes/voice.html">voice</a></li>
+  <li><a href="classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+
+  <h2>Framework for executing checklists in X-Plane</h2>
+
+<h2>Modules</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  nowrap><a href="modules/audio.html">audio</a></td>
+		<td class="summary">Provides functions to load WAVE files.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="modules/preferences.html">preferences</a></td>
+		<td class="summary">Provides functions to save and load preferences.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="modules/sopExecutor.html">sopExecutor</a></td>
+		<td class="summary">Contains the logic for executing a checklist.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="modules/sopRegister.html">sopRegister</a></td>
+		<td class="summary">Holds all created standard operating procedures.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="modules/utils.html">utils</a></td>
+		<td class="summary">Provides common functions used in different code files.</td>
+	</tr>
+</table>
+<h2>Classes</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  nowrap><a href="classes/automaticChecklistItem.html">automaticChecklistItem</a></td>
+		<td class="summary">Implemention of a checklist item which evaluates whether its conditions are met.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></td>
+		<td class="summary">Inherits from the automaticChecklistItem class and provides a dynamic key for the response sound.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/checklist.html">checklist</a></td>
+		<td class="summary">Represents a checklist.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/checklistItem.html">checklistItem</a></td>
+		<td class="summary">Acts as an interface for a checklist item implementation.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/emptyvoice.html">emptyvoice</a></td>
+		<td class="summary">Implementation of a voice which does not play any sound.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/manualChecklistItem.html">manualChecklistItem</a></td>
+		<td class="summary">Implemention of a checklist item which needs to be competed manually.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></td>
+		<td class="summary">Inherits from the manualChecklistItem class and provides a dynamic key for the response sound.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/sound.html">sound</a></td>
+		<td class="summary">Provides functions to play a loaded sound.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/soundChecklistItem.html">soundChecklistItem</a></td>
+		<td class="summary">Implemention of a checklist item which only provides a challenge sound.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/standardOperatingProcedure.html">standardOperatingProcedure</a></td>
+		<td class="summary">Represents a standard operating procedure (SOP).</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/voice.html">voice</a></td>
+		<td class="summary">Acts as an interface for a voice implementation.</td>
+	</tr>
+	<tr>
+		<td class="name"  nowrap><a href="classes/waveFileVoice.html">waveFileVoice</a></td>
+		<td class="summary">Implementation of a voice which uses WAVE files as an audio source.</td>
+	</tr>
+</table>
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-05-28 12:02:07 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
