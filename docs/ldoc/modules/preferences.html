@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>AudioChecklist documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>AudioChecklist</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/audio.html">audio</a></li>
+  <li><strong>preferences</strong></li>
+  <li><a href="../modules/sopExecutor.html">sopExecutor</a></li>
+  <li><a href="../modules/sopRegister.html">sopRegister</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/automaticChecklistItem.html">automaticChecklistItem</a></li>
+  <li><a href="../classes/automaticDynamicResponseChecklistItem.html">automaticDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/checklist.html">checklist</a></li>
+  <li><a href="../classes/checklistItem.html">checklistItem</a></li>
+  <li><a href="../classes/emptyvoice.html">emptyvoice</a></li>
+  <li><a href="../classes/manualChecklistItem.html">manualChecklistItem</a></li>
+  <li><a href="../classes/manualDynamicResponseChecklistItem.html">manualDynamicResponseChecklistItem</a></li>
+  <li><a href="../classes/sound.html">sound</a></li>
+  <li><a href="../classes/soundChecklistItem.html">soundChecklistItem</a></li>
+  <li><a href="../classes/standardOperatingProcedure.html">standardOperatingProcedure</a></li>
+  <li><a href="../classes/voice.html">voice</a></li>
+  <li><a href="../classes/waveFileVoice.html">waveFileVoice</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>preferences</code></h1>
+<p>Provides functions to save and load preferences.</p>
+<p>
+ Preferences are stored as a key-value-pair. The key and the value must be a string.
+<p> The preferences can be saved to a file and loaded again. Each entry is written into a separate line. The line separator is '\n'.
+ Key and value are separated by a '='. When loading a file, every character before the first '=' character is considered as part of the key.
+ All characters between the first '=' and the end of the line are considered as part of the value.
+ Therefore, keys must not contain a '=' character and values must not contain a '\n' character.</p>
+    <h3>Info:</h3>
+    <ul>
+        <li><strong>Copyright</strong>: 2022 Patrick Lang</li>
+        <li><strong>Author</strong>: Patrick Lang</li>
+    </ul>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#escapeString">escapeString (str)</a></td>
+	<td class="summary">Creates a valid preference key based on the provided string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#set">set (key, value)</a></td>
+	<td class="summary">Sets a preference value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get">get (key, defaultValue)</a></td>
+	<td class="summary">Gets a preference value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#remove">remove (key)</a></td>
+	<td class="summary">Removes a preference value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#clear">clear ()</a></td>
+	<td class="summary">Removes all preferences.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#save">save (filePath)</a></td>
+	<td class="summary">Saves the preferences to the specified file.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#load">load (filePath)</a></td>
+	<td class="summary">Loads the preferences from the specified file.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "escapeString"></a>
+    <strong>escapeString (str)</strong>
+    </dt>
+    <dd>
+    Creates a valid preference key based on the provided string.
+ Replaces all '=' characters with an underscore.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The string to convert.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The escaped preference key.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "set"></a>
+    <strong>set (key, value)</strong>
+    </dt>
+    <dd>
+    Sets a preference value.
+ Providing a nil value removes the preference with the given key.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the value.
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The preference value.
+        </li>
+    </ul>
+
+
+    <h3>Raises:</h3>
+    An error is thrown if the key contains a '=' or '\n', or the value contains a '\n'.
+
+
+
+</dd>
+    <dt>
+    <a name = "get"></a>
+    <strong>get (key, defaultValue)</strong>
+    </dt>
+    <dd>
+    Gets a preference value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the value.
+        </li>
+        <li><span class="parameter">defaultValue</span>
+            <span class="types">optional <a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The default value to use if there is no preference with this key. Can be <code>nil</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+        The value for the preference key, or the default value, if there is no preference with this key.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "remove"></a>
+    <strong>remove (key)</strong>
+    </dt>
+    <dd>
+    Removes a preference value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The key of the value to remove.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "clear"></a>
+    <strong>clear ()</strong>
+    </dt>
+    <dd>
+    Removes all preferences.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "save"></a>
+    <strong>save (filePath)</strong>
+    </dt>
+    <dd>
+    Saves the preferences to the specified file.
+  If the file could not be opened for writing, then the preferences are not saved.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">filePath</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The path to the target file.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the preferences has been saved, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "load"></a>
+    <strong>load (filePath)</strong>
+    </dt>
+    <dd>
+    Loads the preferences from the specified file.
+ If the file does not exist, then no preferences are loaded.
+ The actual preferences are not reset before loading the file. Already existing preferences are overwritten.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">filePath</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
+         The path to the file which contains the preferences.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the preferences has been loaded, otherwise <code>false</code>.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-05-28 12:58:52 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
