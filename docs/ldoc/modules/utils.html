@@ -126,11 +126,11 @@
 	<td class="summary">Checks whether any item of an array meets a given condition.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#readDataRefInteger">readDataRefInteger (dataRefName)</a></td>
+	<td class="name" nowrap><a href="#readDataRefInteger">readDataRefInteger (dataRefName, defaultValue)</a></td>
 	<td class="summary">Reads an integer DataRef from X-Plane.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#readDataRefFloat">readDataRefFloat (dataRefName)</a></td>
+	<td class="name" nowrap><a href="#readDataRefFloat">readDataRefFloat (dataRefName, defaultValue)</a></td>
 	<td class="summary">Reads a float DataRef from X-Plane.</td>
 	</tr>
 	<tr>
@@ -467,7 +467,7 @@
 </dd>
     <dt>
     <a name = "readDataRefInteger"></a>
-    <strong>readDataRefInteger (dataRefName)</strong>
+    <strong>readDataRefInteger (dataRefName, defaultValue)</strong>
     </dt>
     <dd>
     Reads an integer DataRef from X-Plane.
@@ -480,13 +480,17 @@
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          The name of the DataRef.
         </li>
+        <li><span class="parameter">defaultValue</span>
+            <span class="types">optional <span class="type">number</span></span>
+         The default value to return if the DataRef was not found.
+        </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
            <span class="types">optional <span class="type">number</span></span>
-        The value of the DataRef or <code>nil</code>, if the DataRef was not found.
+        The value of the DataRef or the default value, if the DataRef was not found.
     </ol>
 
 
@@ -495,7 +499,7 @@
 </dd>
     <dt>
     <a name = "readDataRefFloat"></a>
-    <strong>readDataRefFloat (dataRefName)</strong>
+    <strong>readDataRefFloat (dataRefName, defaultValue)</strong>
     </dt>
     <dd>
     Reads a float DataRef from X-Plane.
@@ -508,13 +512,17 @@
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.3/manual.html#6.4">string</a></span>
          The name of the DataRef.
         </li>
+        <li><span class="parameter">defaultValue</span>
+            <span class="types">optional <span class="type">number</span></span>
+         The default value to return if the DataRef was not found.
+        </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
            <span class="types">optional <span class="type">number</span></span>
-        The value of the DataRef or <code>nil</code>, if the DataRef was not found.
+        The value of the DataRef or the default value, if the DataRef was not found.
     </ol>
 
 
@@ -553,8 +561,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types">optional <span class="type">bool</span></span>
-        <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
     </ol>
 
 
@@ -597,8 +605,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types">optional <span class="type">bool</span></span>
-        <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
     </ol>
 
 
@@ -641,8 +649,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types">optional <span class="type">bool</span></span>
-        <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the verification function returns <code>true</code> for all items within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
     </ol>
 
 
@@ -685,8 +693,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types">optional <span class="type">bool</span></span>
-        <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>nil</code> is returned.
+           <span class="types"><span class="type">bool</span></span>
+        <code>True</code> if the verification function returns <code>true</code> for any item within the range, otherwise <code>false</code>. If the DataRef was not found, then <code>false</code> is returned.
     </ol>
 
 
@@ -704,7 +712,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-02-12 19:30:19 </i>
+<i style="float:right;">Last updated 2022-02-25 19:40:03 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
