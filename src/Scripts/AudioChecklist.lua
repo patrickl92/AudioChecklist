@@ -246,12 +246,15 @@ local function updateChecklistWindowSize()
 		return
 	end
 
-    utils.logDebug("Main", "Updating checklist window size")
+	utils.logDebug("Main", "Updating checklist window size")
 
 	local checklistWindowLeft, checklistWindowTop, checklistWindowRight, checklistWindowBottom = float_wnd_get_geometry(checklistWindow)
 	local xPlaneWindowLeft, xPlaneWindowTop, xPlaneWindowRight, xPlaneWindowBottom = XPLMGetScreenBoundsGlobal()
 
-	-- Used a fixed default with, because it does not work to calculate the current width if the window is popped out
+	utils.logDebug("Main", "Current checklist window location: Left: " .. tostring(checklistWindowLeft) .. "; Top: " .. tostring(checklistWindowTop) .. "; Right: " .. tostring(checklistWindowRight) .. "; Bottom: " .. tostring(checklistWindowBottom))
+	utils.logDebug("Main", "Global screen bounds: Left: " .. tostring(xPlaneWindowLeft) .. "; Top: " .. tostring(xPlaneWindowTop) .. "; Right: " .. tostring(xPlaneWindowRight) .. "; Bottom: " .. tostring(xPlaneWindowBottom))
+
+	-- Used a fixed default width, because it does not work to calculate the current width if the window is popped out
 	local requiredWidth = 332
 	local requiredHeight = checklistWindowTop - checklistWindowBottom
 	local maxHeight = xPlaneWindowTop - xPlaneWindowBottom - 100
@@ -296,7 +299,7 @@ local function updateChecklistWindowSize()
 	float_wnd_set_geometry(checklistWindow, left, top, right, bottom)
 	float_wnd_set_resizing_limits(checklistWindow, requiredWidth, requiredHeight, requiredWidth, requiredHeight)
 
-    utils.logDebug("Main", "Checklist window location: Left: " .. tostring(left) .. "; Top: " .. tostring(top) .. "; Right: " .. tostring(right) .. "; Bottom: " .. tostring(bottom))
+    utils.logDebug("Main", "New checklist window location: Left: " .. tostring(left) .. "; Top: " .. tostring(top) .. "; Right: " .. tostring(right) .. "; Bottom: " .. tostring(bottom))
 end
 
 --- Renders the menu for selecting a standard operating procedure.
