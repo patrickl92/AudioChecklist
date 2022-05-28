@@ -363,6 +363,37 @@ local function renderSopMenu()
 	imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
 
 	-- ##################################
+	-- No SOP installed message
+	-- ##################################
+
+	if #filteredSOPs == 0 then
+		imgui.PushTextWrapPos(0)
+		imgui.TextUnformatted("You have no SOP installed for the selected plane. SOPs must be installed separately.")
+
+		imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
+		imgui.TextUnformatted("Check out the GitHub page to download the available SOPs.")
+
+		imgui.PopTextWrapPos()
+		imgui.SetCursorPosY(imgui.GetCursorPosY() + 10)
+
+		if imgui.Button("Open GitHub: patrickl92/AudioChecklistSOPs", 315, 25) then
+			-- Windows
+			local command = 'start https://github.com/patrickl92/AudioChecklistSOPs'
+
+			if SYSTEM == "APL" then
+				-- Mac
+				command = 'open https://github.com/patrickl92/AudioChecklistSOPs'
+			elseif SYSTEM == "LIN" then
+				-- Linux
+				command = 'xdg-open https://github.com/patrickl92/AudioChecklistSOPs'
+			end
+
+			os.execute(command)
+		end
+		return
+	end
+
+	-- ##################################
 	-- SOP selection
 	-- ##################################
 
